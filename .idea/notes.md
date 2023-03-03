@@ -8,7 +8,6 @@
 ## Task
 - ID: Integer
 - Task Name: String
-- Aktivitäten: Aktivität[]
 
 ## Aktivität
 - ID: Integer
