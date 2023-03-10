@@ -16,17 +16,23 @@
 </body>
 <footer>
     <div class="task-bar">
-        <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i></button>
-        <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i></i></button>
-        <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i></button>
-        <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i></button>
+        <div class="task-bar-container">
+            <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i></button>
+            <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i></i></button>
+            <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i></button>
+            <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i></button>
+        </div>
     </div>
 </footer>
 </html>
 
 <style>
+    html {
+        font-family: arial;
+    }
     .task-bar {
         position: fixed;
+        background-color: #eee;
         bottom: 0;
         left: 0;
         width: 100%;
@@ -35,9 +41,18 @@
         justify-content: space-around;
         align-items: center;
     }
+    .task-bar-container {
+        display: flex;
+        /* justify-content: space-around; */
+        align-items: center;
+        max-width: 800px;
+    }
+
     .btn {
         width: 100px;
         height: 30px;
+        margin-left: 10px;
+        margin-right: 10px;
         background-color: #ddd;        border: none;
         border-radius: 5px;
         color: #000;
