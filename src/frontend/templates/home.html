@@ -10,7 +10,7 @@
     </h1></center>
     <center>
         <div class="pngviewer">
-            <img src="{{url_for('static', filename='current_frame.png')}}" style="width: 90vw"/>
+            <img id="img-viewer" src="{{url_for('static', filename='current_frame.png')}}" style="width: 90vw"/>
         </div>
     </center>
 </body>
@@ -67,5 +67,35 @@
         });
         input.click();
         alert()
+    })
+
+    document.getElementById("btn-backward").addEventListener('click', function() {
+        fetch('/prev')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                // Convert the byte array to a Blob
+                const blob = new Blob([data], { type: 'image/png' });
+
+                // Create a URL for the Blob
+                const url = URL.createObjectURL(blob);
+
+                // Set the URL as the source of the img tag
+                document.getElementById('img-viewer').src = url;
+            });
+    })
+
+    document.getElementById("btn-forward").addEventListener('click', function() {
+        fetch('/next')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                // Convert the byte array to a Blob
+                const blob = new Blob([data], { type: 'image/png' });
+
+                // Create a URL for the Blob
+                const url = URL.createObjectURL(blob);
+
+                // Set the URL as the source of the img tag
+                document.getElementById('img-viewer').src = url;
+            });
     })
 </script>
