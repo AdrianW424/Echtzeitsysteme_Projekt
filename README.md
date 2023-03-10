@@ -5,6 +5,7 @@
 
 ## TODO:
 * Reihenfolge der Elemente in der CSV-Datei ändern (auch im Python-Code, der einliest)
+* Einfügen von & (UND) sowie | (ODER) für die Semaphoren (in CSV-Datei sowie Python-Code)
 * Frontend: 
     * in Mitte wird jpg oder so dargestellt
     * User Interface mit Buttons (Datei laden, Animation beginnen (Animation weitergehen, Animation zurückgehen, Animation speichern))
