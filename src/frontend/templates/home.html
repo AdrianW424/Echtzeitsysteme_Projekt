@@ -9,17 +9,17 @@
         Flowchart Viewer
     </h1></center>
     <center>
-        <div class="png-window">
-            <img src="{{url_for('static', filename='flowchart.jpg')}}" align="middle"/>
+        <div class="pngviewer">
+            <img src="{{url_for('static', filename='current_frame.png')}}" style="width: 90vw"/>
         </div>
     </center>
 </body>
 <footer>
     <div class="task-bar">
-        <button class="btn"><i class="fa fa-file"></i></button>
-        <button class="btn"><i class="fa fa-backward"></i></i></button>
-        <button class="btn"><i class="fa fa-forward"></i></button>
-        <button class="btn"><i class="fa fa-save"></i></button>
+        <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i></button>
+        <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i></i></button>
+        <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i></button>
+        <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i></button>
     </div>
 </footer>
 </html>
@@ -48,4 +48,24 @@
     .btn:hover {
         background-color: #ccc;
     }
+
+    .pngviewer {
+        width: 95vw;
+        border: 1px solid black;
+        border-radius: 5px;
+    }
 </style>
+
+<script>
+    document.getElementById("btn-file").addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('change', () => {
+            const file = input.files[0];
+            const path = URL.createObjectURL(file);
+            console.log(`Selected file: ${path}`); // <-- this is the path you want 
+        });
+        input.click();
+        alert()
+    })
+</script>
