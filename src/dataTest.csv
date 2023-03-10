@@ -3,6 +3,6 @@ Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semap
 2,Task2,2,Activity2,None,24,Semaphore24,None,12,234,Mutex234
 3,Task3,3,Activity3,None,36,Semaphore36,None,13,234,Mutex234
 4,Task4,4,Activity4,None,46,Semaphore46,None,24,234,Mutex234
-5,Task5,5,Activity5a,None,55,Semaphore55,None,56;65,None,None
+5,Task5,5,Activity5a,None,55,Semaphore55,None,[56;65],None,None
 5,Task5,7,Activity5b,None,51;56,Semaphore51;Semaphore56,1;1,55,None,None
 6,Task6,6,Activity6,None,65,Semaphore65,None,36;46,None,None
