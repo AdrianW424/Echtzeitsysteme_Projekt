@@ -1,8 +1,8 @@
-Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semaphore_Name,Semaphore_Initial_Value,Mutex_ID,Mutex_Name,Predecessor_Semaphore_ID
-1,Task1,1,Activity1,None,12;13,Semaphore12;Semaphore13,None;None,None,None,51
-2,Task2,2,Activity2,None,24,Semaphore24,None,234,Mutex234,12
-3,Task3,3,Activity3,None,36,Semaphore36,None,234,Mutex234,13
-4,Task4,4,Activity4,None,46,Semaphore46,None,234,Mutex234,24
-5,Task5,5,Activity5a,None,55,Semaphore55,None,None,None,56;65
-5,Task5,7,Activity5b,None,51;56,Semaphore51;Semaphore56,1;1,None,None,55
-6,Task6,6,Activity6,None,65,Semaphore65,None,None,None,36;46
+Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semaphore_Name,Semaphore_Initial_Value,Predecessor_Semaphore_ID,Mutex_ID,Mutex_Name
+1,Task1,1,Activity1,None,12;13,Semaphore12;Semaphore13,None;None,51,None,None
+2,Task2,2,Activity2,None,24,Semaphore24,None,12,234,Mutex234
+3,Task3,3,Activity3,None,36,Semaphore36,None,13,234,Mutex234
+4,Task4,4,Activity4,None,46,Semaphore46,None,24,234,Mutex234
+5,Task5,5,Activity5a,None,55,Semaphore55,None,56;65,None,None
+5,Task5,7,Activity5b,None,51;56,Semaphore51;Semaphore56,1;1,55,None,None
+6,Task6,6,Activity6,None,65,Semaphore65,None,36;46,None,None

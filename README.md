@@ -4,7 +4,6 @@
 -> Entwicklung eines Programmes, welches ein Ablaufdiagramm aus einer CSV Datei einlesen und visualisieren kann.
 
 ## TODO:
-* Reihenfolge der Elemente in der CSV-Datei ändern (auch im Python-Code, der einliest)
 * Einfügen von & (UND) sowie | (ODER) für die Semaphoren (in CSV-Datei sowie Python-Code)
 * Frontend: 
     * in Mitte wird jpg oder so dargestellt
@@ -12,3 +11,4 @@
     * Datei (CSV) muss irgendwie geladen werden können
 * Programm zur Erstellung von jpg-Bildern (oder so) aus den Arrays sowie verketteten Objekten
 * Animationsalgorithmus entwickeln und implementieren
+* Programm unabhängig gegenüber falschen Eingaben in CSV-Datei machen
