@@ -8,7 +8,7 @@
 * Einfügen von & (UND) sowie | (ODER) für die Semaphoren (in CSV-Datei sowie Python-Code)
 * Frontend: 
     * in Mitte wird jpg oder so dargestellt
-    * User Interface mit Buttons (Datei laden, Animation beginnen (Animation weitergehen, Animation zurückgehen, Animation speichern))
+    * User Interface mit Buttons (Datei laden, Animation beginnen (Animation weitergehen, Animation zurückgehen, Animation/Bild speichern))
     * Datei (CSV) muss irgendwie geladen werden können
 * Programm zur Erstellung von jpg-Bildern (oder so) aus den Arrays sowie verketteten Objekten
 * Animationsalgorithmus entwickeln und implementieren
