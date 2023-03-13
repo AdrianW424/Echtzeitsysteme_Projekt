@@ -1,8 +1,17 @@
 // Flowchart
 digraph {
-	1 [label="{Task1|Activity1}" fillcolor=green shape=record style="rounded,filled"]
+	size="1000,1000"
+	1 [label="{Task1|Activity1}" fillcolor=white shape=record style="rounded,filled"]
 	2 [label="{Task2|Activity2}" fillcolor=white shape=record style="rounded,filled"]
-	1 -> 2 [label=Semaphore12 color=black splines=polyline]
-	1 -> 2 [label=Semaphore13 color=black splines=polyline]
-	2 -> 1 [label=Semaphore21 color=red splines=polyline]
+	Dummy0 [height=0.01 shape=point width=0.01]
+	1 -> Dummy0 [arrowhead=none color=black splines=polyline]
+	Dummy0 -> 2 [label=Semaphore12 color=black splines=polyline]
+	Dummy1 [shape=point xlabel=""]
+	Dummy0 -> Dummy1 [arrowhead=none splines=polyline]
+	Dummy2 [height=0.01 shape=point width=0.01]
+	1 -> Dummy2 [arrowhead=none color=black splines=polyline]
+	Dummy2 -> 2 [label=Semaphore13 color=black splines=polyline]
+	Dummy3 [shape=point xlabel=""]
+	Dummy2 -> Dummy3 [arrowhead=none splines=polyline]
+	2 -> 1 [label=Semaphore21 color=black splines=polyline]
 }
