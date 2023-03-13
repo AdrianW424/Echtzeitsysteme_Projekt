@@ -1,0 +1,8 @@
+// Flowchart
+digraph {
+	1 [label="{Task1|Activity1}" fillcolor=green shape=record style="rounded,filled"]
+	2 [label="{Task2|Activity2}" fillcolor=white shape=record style="rounded,filled"]
+	1 -> 2 [label=Semaphore12 color=black splines=polyline]
+	1 -> 2 [label=Semaphore13 color=black splines=polyline]
+	2 -> 1 [label=Semaphore21 color=red splines=polyline]
+}
