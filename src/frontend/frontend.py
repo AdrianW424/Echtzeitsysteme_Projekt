@@ -85,7 +85,6 @@ for index, row in df.iterrows():
     if row["Activity_ID"] not in activities_IDs:
         activities_IDs.append(row["Activity_ID"])
         activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
-        # print(row["Predecessor_Semaphore_ID"])
     
     # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
     for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
@@ -127,7 +126,6 @@ for activity in activities:
                 semaphore_id = semaphore_id[:-1]
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                print(semaphore_id)
             else:
                 semaphore_ids = []
                 while semaphore_id[-1] != ']':
@@ -141,7 +139,6 @@ for activity in activities:
                     for semaphore in semaphore_ids:
                         if not semaphore == semaphore_id:
                             semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
-                print(semaphore_ids)
         
         # if end equals ']' -> end of or)
         
@@ -149,7 +146,6 @@ for activity in activities:
         else:
             activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
             semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-            print(semaphore_id)
 
 import graphviz as gv
 dot = gv.Digraph(comment='Flowchart')
@@ -365,24 +361,14 @@ def createNextFrame():
 @app.route("/next")
 def getCurrentImage():
     global dot
-    dot = gv.Digraph(comment='Flowchart')
+    dot = gv.Digraph(format='jpg')
     global dummyCounter
     dummyCounter = 0
     
     createRects()
     createMutexs()
     createSemaphores()
-    return dot.render(format='jpg')
-
-
-
-# @app.route("/next")
-# def next():
-#     return(generator.getCurrentImage())
-
-# @app.route("/prev")
-# def prev():
-#     return(generator.prev_frame())
+    return(dot.render(view=False, filename=None, directory=None, outfile=None, format='jpg'))
 
 @app.route("/")
 def home():

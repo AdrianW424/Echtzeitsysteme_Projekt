@@ -1,4 +1,3 @@
-// Flowchart
 digraph {
 	1 [label="{Task1|Activity1}" fillcolor=white shape=record style="rounded,filled"]
 	2 [label="{Task2|Activity2}" fillcolor=white shape=record style="rounded,filled"]
