@@ -91,7 +91,7 @@ for index, row in df.iterrows():
     for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
         if semaphore_ID != "None" and semaphore_ID not in semaphore_IDs:
             semaphore_IDs.append(semaphore_ID)
-            semaphores.append(Semaphore(semaphore_ID, row["Semaphore_Name"][index], [], int(row["Semaphore_Initial_Value"][index]), [], []))
+            semaphores.append(Semaphore(semaphore_ID, row["Semaphore_Name"][index], [], int(row["Semaphore_Initial_Value"][index]), None, None))
         
     for index, mutex_ID in enumerate(row["Mutex_ID"]):
         if mutex_ID != "None" and mutex_ID not in mutex_IDs:
@@ -112,6 +112,44 @@ for index, row in df.iterrows():
         if mutex_ID != "None":
             activities[activities_IDs.index(row["Activity_ID"])].mutexes.append(mutexs[mutex_IDs.index(mutex_ID)])
             mutexs[mutex_IDs.index(mutex_ID)].activities.append(activities[activities_IDs.index(row["Activity_ID"])])
+
+# add semaphoreIN to activities and semaphores
+for activity in activities:
+    buf = activity.semaphoresIN
+    activity.semaphoresIN = []
+    while len(buf) > 0:
+        semaphore_id = buf.pop(0)
+        # if start equals '[' -> start of or)
+        if semaphore_id[0] == '[':
+            semaphore_id = semaphore_id[1:]
+            
+            if semaphore_id[-1] == ']':
+                semaphore_id = semaphore_id[:-1]
+                activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
+                semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+                print(semaphore_id)
+            else:
+                semaphore_ids = []
+                while semaphore_id[-1] != ']':
+                    semaphore_ids.append(semaphore_id)
+                    semaphore_id = buf.pop(0)
+                semaphore_ids.append(semaphore_id[:-1])
+                for semaphore_id in semaphore_ids:
+                    activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
+                    semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+                    # set the groupWith value of the semaphores and add every semaphore to the group except for the current one
+                    for semaphore in semaphore_ids:
+                        if not semaphore == semaphore_id:
+                            semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
+                print(semaphore_ids)
+        
+        # if end equals ']' -> end of or)
+        
+        # else -> and
+        else:
+            activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
+            semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+            print(semaphore_id)
 
 import graphviz as gv
 dot = gv.Digraph(comment='Flowchart')
@@ -160,9 +198,6 @@ def createSemaphores():
                 semaphores_buf.remove(groupSemaphore)
         else:
             # if semaphore is leading to the same task where it came from, use another arrowhead
-            print(type(semaphore.activityIN.parentTask.ID))
-            print(semaphore.activityIN.parentTask.ID.length)
-            break
             if semaphore.activityIN.parentTask.ID == semaphore.activityOUT.parentTask.ID:
                 # if semaphore has an initial value, connect an edge to the semaphore
                 if semaphore.initialValue > 0:
