@@ -1,3 +1,3 @@
 Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semaphore_Name,Semaphore_Initial_Value,Predecessor_Semaphore_ID,Mutex_ID,Mutex_Name
-1,Task1,1,Activity1,1,12,Semaphore12,1,21,None,None
-2,Task2,2,Activity2,1,21,Semaphore21,0,12,None,None
+1,Task1,1,Activity1,1,12;13,Semaphore12;Semaphore13,1;1,21,None,None
+2,Task2,2,Activity2,1,21,Semaphore21,0,12;13,None,None
