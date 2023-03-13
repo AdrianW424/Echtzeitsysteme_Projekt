@@ -354,12 +354,20 @@ def reinitializeInitialValuesSemaphores():
         semaphores[semaphore_IDs.index(valorem[0])].initialValue = valorem[1]
 
 # just a helper method
+@app.route("/next")
 def createNextFrame():
     getNextFrame()
-    getCurrentImage()
+    return(getCurrentImage())
     
-@app.route("/next")
+
+imageBuffer = []
+position = 0
+
 def getCurrentImage():
+    global position
+    position+= 1
+    if position < len(imageBuffer):
+        return imageBuffer[position]
     global dot
     dot = gv.Digraph(format='jpg')
     global dummyCounter
@@ -368,7 +376,18 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    return(dot.render(view=False, filename=None, directory=None, outfile=None, format='jpg'))
+    image = dot.pipe(format='jpg')
+    imageBuffer.append(image)
+    return(image)
+getCurrentImage()
+
+@app.route("/prev")
+def getPrevImage():
+    global position
+    position -= 1
+    if position >= 0:
+        return imageBuffer[position]
+    return imageBuffer[0]
 
 @app.route("/")
 def home():
