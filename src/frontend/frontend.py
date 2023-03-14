@@ -369,14 +369,14 @@ def getCurrentImage():
     if position < len(imageBuffer):
         return imageBuffer[position]
     global dot
-    dot = gv.Digraph(format='jpg')
+    dot = gv.Digraph(format='svg')
     global dummyCounter
     dummyCounter = 0
     
     createRects()
     createMutexs()
     createSemaphores()
-    image = dot.pipe(format='jpg')
+    image = dot.pipe(format='svg')
     imageBuffer.append(image)
     return(image)
 getCurrentImage()

@@ -90,7 +90,7 @@
             .then(response => response.arrayBuffer())
             .then(data => {
                 // Convert the byte array to a Blob
-                const blob = new Blob([data], { type: 'image/jpg' });
+                const blob = new Blob([data], { type: 'image/svg+xml' });
 
                 // Create a URL for the Blob
                 const url = URL.createObjectURL(blob);
@@ -105,7 +105,7 @@
             .then(response => response.arrayBuffer())
             .then(data => {
                 // Convert the byte array to a Blob
-                const blob = new Blob([data], { type: 'image/jpg' });
+                const blob = new Blob([data], { type: 'image/svg+xml' });
 
                 // Create a URL for the Blob
                 const url = URL.createObjectURL(blob);
