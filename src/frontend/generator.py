@@ -1,3 +1,5 @@
+import pandas as pd
+
 class Task:
     def __init__(self, ID, name, activities):
         self.ID = ID
@@ -32,29 +34,6 @@ class Semaphore:
         self.activityOUT = activityOUT
         self.currentValue = 0
 
-dataFilePath = "./dataTest2.csv"
-
-data = []
-linecells = []
-
-import pandas as pd
-df = pd.read_csv(dataFilePath, sep=',')
-
-# split seperated values into list elements
-df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
-df["Semaphore_ID"] = df["Semaphore_ID"].str.split(";")
-df["Semaphore_Name"] = df["Semaphore_Name"].astype(str)
-df["Semaphore_Name"] = df["Semaphore_Name"].str.split(";")
-df["Semaphore_Initial_Value"] = df["Semaphore_Initial_Value"].astype(str)
-df["Semaphore_Initial_Value"] = df["Semaphore_Initial_Value"].str.split(";")
-df["Predecessor_Semaphore_ID"] = df["Predecessor_Semaphore_ID"].astype(str)
-df["Predecessor_Semaphore_ID"] = df["Predecessor_Semaphore_ID"].str.split(";")
-df["Mutex_ID"] = df["Mutex_ID"].astype(str)
-df["Mutex_ID"] = df["Mutex_ID"].str.split(";")
-df["Mutex_Name"] = df["Mutex_Name"].astype(str)
-df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
-
-# only during the creation process of the tree
 tasks_IDs = []
 tasks = []
 
@@ -67,83 +46,107 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
-for index, row in df.iterrows():
-    # first: instantiation of objects
-    if row["Task_ID"] not in tasks_IDs:
-        tasks_IDs.append(row["Task_ID"])
-        tasks.append(Task(row["Task_ID"], row["Task_Name"], []))
-    
-    if row["Activity_ID"] not in activities_IDs:
-        activities_IDs.append(row["Activity_ID"])
-        activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
-        print(row["Predecessor_Semaphore_ID"])
-    
-    # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
-    for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
-        if semaphore_ID != "None" and semaphore_ID not in semaphore_IDs:
-            semaphore_IDs.append(semaphore_ID)
-            semaphores.append(Semaphore(semaphore_ID, row["Semaphore_Name"][index], [], int(row["Semaphore_Initial_Value"][index]), [], []))
-        
-    for index, mutex_ID in enumerate(row["Mutex_ID"]):
-        if mutex_ID != "None" and mutex_ID not in mutex_IDs:
-            mutex_IDs.append(mutex_ID)
-            mutexs.append(Mutex(mutex_ID, row["Mutex_Name"][index], []))
-            
-    # add semaphoreIN to activities and semaphores
-    
-    # secondly: linking of objects
-    tasks[tasks_IDs.index(row["Task_ID"])].activities.append(activities[activities_IDs.index(row["Activity_ID"])])
-    
-    activities[activities_IDs.index(row["Activity_ID"])].parentTask = tasks[tasks_IDs.index(row["Task_ID"])]
-    for semaphore_ID in row["Semaphore_ID"]:
-        if semaphore_ID != "None":
-            activities[activities_IDs.index(row["Activity_ID"])].semaphoresOUT.append(semaphores[semaphore_IDs.index(semaphore_ID)])
-            semaphores[semaphore_IDs.index(semaphore_ID)].activityOUT = activities[activities_IDs.index(row["Activity_ID"])]
-    for mutex_ID in row["Mutex_ID"]:
-        if mutex_ID != "None":
-            activities[activities_IDs.index(row["Activity_ID"])].mutexes.append(mutexs[mutex_IDs.index(mutex_ID)])
-            mutexs[mutex_IDs.index(mutex_ID)].activities.append(activities[activities_IDs.index(row["Activity_ID"])])
+def openFromCSV(dataFilePath):
 
-# add semaphoreIN to activities and semaphores
-for activity in activities:
-    buf = activity.semaphoresIN
-    activity.semaphoresIN = []
-    while len(buf) > 0:
-        semaphore_id = buf.pop(0)
-        # if start equals '[' -> start of or)
-        if semaphore_id[0] == '[':
-            semaphore_id = semaphore_id[1:]
+    data = []
+    linecells = []
+
+
+    df = pd.read_csv(dataFilePath, sep=',')
+
+    # split seperated values into list elements
+    df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
+    df["Semaphore_ID"] = df["Semaphore_ID"].str.split(";")
+    df["Semaphore_Name"] = df["Semaphore_Name"].astype(str)
+    df["Semaphore_Name"] = df["Semaphore_Name"].str.split(";")
+    df["Semaphore_Initial_Value"] = df["Semaphore_Initial_Value"].astype(str)
+    df["Semaphore_Initial_Value"] = df["Semaphore_Initial_Value"].str.split(";")
+    df["Predecessor_Semaphore_ID"] = df["Predecessor_Semaphore_ID"].astype(str)
+    df["Predecessor_Semaphore_ID"] = df["Predecessor_Semaphore_ID"].str.split(";")
+    df["Mutex_ID"] = df["Mutex_ID"].astype(str)
+    df["Mutex_ID"] = df["Mutex_ID"].str.split(";")
+    df["Mutex_Name"] = df["Mutex_Name"].astype(str)
+    df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
+
+    # only during the creation process of the tree
+
+    for index, row in df.iterrows():
+        # first: instantiation of objects
+        if row["Task_ID"] not in tasks_IDs:
+            tasks_IDs.append(row["Task_ID"])
+            tasks.append(Task(row["Task_ID"], row["Task_Name"], []))
+        
+        if row["Activity_ID"] not in activities_IDs:
+            activities_IDs.append(row["Activity_ID"])
+            activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
+            print(row["Predecessor_Semaphore_ID"])
+        
+        # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
+        for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
+            if semaphore_ID != "None" and semaphore_ID not in semaphore_IDs:
+                semaphore_IDs.append(semaphore_ID)
+                semaphores.append(Semaphore(semaphore_ID, row["Semaphore_Name"][index], [], int(row["Semaphore_Initial_Value"][index]), [], []))
             
-            if semaphore_id[-1] == ']':
-                semaphore_id = semaphore_id[:-1]
+        for index, mutex_ID in enumerate(row["Mutex_ID"]):
+            if mutex_ID != "None" and mutex_ID not in mutex_IDs:
+                mutex_IDs.append(mutex_ID)
+                mutexs.append(Mutex(mutex_ID, row["Mutex_Name"][index], []))
+                
+        # add semaphoreIN to activities and semaphores
+        
+        # secondly: linking of objects
+        tasks[tasks_IDs.index(row["Task_ID"])].activities.append(activities[activities_IDs.index(row["Activity_ID"])])
+        
+        activities[activities_IDs.index(row["Activity_ID"])].parentTask = tasks[tasks_IDs.index(row["Task_ID"])]
+        for semaphore_ID in row["Semaphore_ID"]:
+            if semaphore_ID != "None":
+                activities[activities_IDs.index(row["Activity_ID"])].semaphoresOUT.append(semaphores[semaphore_IDs.index(semaphore_ID)])
+                semaphores[semaphore_IDs.index(semaphore_ID)].activityOUT = activities[activities_IDs.index(row["Activity_ID"])]
+        for mutex_ID in row["Mutex_ID"]:
+            if mutex_ID != "None":
+                activities[activities_IDs.index(row["Activity_ID"])].mutexes.append(mutexs[mutex_IDs.index(mutex_ID)])
+                mutexs[mutex_IDs.index(mutex_ID)].activities.append(activities[activities_IDs.index(row["Activity_ID"])])
+
+    # add semaphoreIN to activities and semaphores
+    for activity in activities:
+        buf = activity.semaphoresIN
+        activity.semaphoresIN = []
+        while len(buf) > 0:
+            semaphore_id = buf.pop(0)
+            # if start equals '[' -> start of or)
+            if semaphore_id[0] == '[':
+                semaphore_id = semaphore_id[1:]
+                
+                if semaphore_id[-1] == ']':
+                    semaphore_id = semaphore_id[:-1]
+                    activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
+                    semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+                    print(semaphore_id)
+                else:
+                    semaphore_ids = []
+                    while semaphore_id[-1] != ']':
+                        semaphore_ids.append(semaphore_id)
+                        semaphore_id = buf.pop(0)
+                    semaphore_ids.append(semaphore_id[:-1])
+                    for semaphore_id in semaphore_ids:
+                        activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
+                        semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+                        # set the groupWith value of the semaphores and add every semaphore to the group except for the current one
+                        for semaphore in semaphore_ids:
+                            if not semaphore == semaphore_id:
+                                semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
+                    print(semaphore_ids)
+            
+            # if end equals ']' -> end of or)
+            
+            # else -> and
+            else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
                 print(semaphore_id)
-            else:
-                semaphore_ids = []
-                while semaphore_id[-1] != ']':
-                    semaphore_ids.append(semaphore_id)
-                    semaphore_id = buf.pop(0)
-                semaphore_ids.append(semaphore_id[:-1])
-                for semaphore_id in semaphore_ids:
-                    activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
-                    semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                    # set the groupWith value of the semaphores and add every semaphore to the group except for the current one
-                    for semaphore in semaphore_ids:
-                        if not semaphore == semaphore_id:
-                            semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
-                print(semaphore_ids)
-        
-        # if end equals ']' -> end of or)
-        
-        # else -> and
-        else:
-            activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
-            semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-            print(semaphore_id)
-            
-import graphviz as gv
-dummyCounter = 0
+                
+    import graphviz as gv
+    dummyCounter = 0
 
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
