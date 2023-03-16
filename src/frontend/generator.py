@@ -89,7 +89,8 @@ class Activity:
                 return False
         
         for mutex in self.mutexes:
-            self.pickMutex(mutex)
+            if mutex not in self.pickedMutexes:
+                self.pickMutex(mutex)
         # return true if all mutexes could be picked
         return True
     
@@ -100,7 +101,7 @@ class Activity:
     def releaseMutexes(self):
         for mutex in self.pickedMutexes:
             mutex.pickedBy = None
-            self.pickedMutexes.remove(mutex)
+        self.pickedMutexes = []
             
     def pickMutex(self, mutex):
         self.pickedMutexes.append(mutex)

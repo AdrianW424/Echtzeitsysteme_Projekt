@@ -10,6 +10,7 @@ HIGH-Priority:
     * User Interface mit Buttons (Datei laden, Animation beginnen (Animation weitergehen, Animation zurückgehen, Animation/Bild speichern))
     * Datei (CSV) muss irgendwie geladen werden können
 * Animationsalgorithmus entwickeln und implementieren - 90% fertig (genauere Tests durchführen, Mutex einbauen)
+* Semaphoren currentValue nicht nur auf 0 und 1, sondern auch über 1 hinaus setzen können
 
 MEDIUM-Priority:
 * Programm verschönern
