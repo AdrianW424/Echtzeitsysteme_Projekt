@@ -19,3 +19,4 @@ LOW-Priority:
 
 TOTEST:
 * Mehrere Semaphoren mit unterschiedlichen Initialwert
+* Activity mit Duration 0
