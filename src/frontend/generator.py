@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-=======
-from io import BytesIO
-from PIL import Image
-import pandas as pd
 
->>>>>>> 6694ef73977bca7dd3870853bde79e9910dcd950
 class Task:
     def __init__(self, ID, name, activities):
         self.ID = ID
@@ -39,32 +33,6 @@ class Semaphore:
         self.activityOUT = activityOUT
         self.currentValue = 0
 
-<<<<<<< HEAD
-dataFilePath = "./dataTest2.csv"
-
-data = []
-linecells = []
-
-import pandas as pd
-df = pd.read_csv(dataFilePath, sep=',')
-
-# split seperated values into list elements
-df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
-df["Semaphore_ID"] = df["Semaphore_ID"].str.split(";")
-df["Semaphore_Name"] = df["Semaphore_Name"].astype(str)
-df["Semaphore_Name"] = df["Semaphore_Name"].str.split(";")
-df["Semaphore_Initial_Value"] = df["Semaphore_Initial_Value"].astype(str)
-df["Semaphore_Initial_Value"] = df["Semaphore_Initial_Value"].str.split(";")
-df["Predecessor_Semaphore_ID"] = df["Predecessor_Semaphore_ID"].astype(str)
-df["Predecessor_Semaphore_ID"] = df["Predecessor_Semaphore_ID"].str.split(";")
-df["Mutex_ID"] = df["Mutex_ID"].astype(str)
-df["Mutex_ID"] = df["Mutex_ID"].str.split(";")
-df["Mutex_Name"] = df["Mutex_Name"].astype(str)
-df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
-
-# only during the creation process of the tree
-=======
->>>>>>> 6694ef73977bca7dd3870853bde79e9910dcd950
 tasks_IDs = []
 tasks = []
 
