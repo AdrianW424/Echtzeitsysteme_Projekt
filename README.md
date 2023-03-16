@@ -7,9 +7,9 @@
 HIGH-Priority:
 * Frontend:
     * in Mitte wird jpg oder so dargestellt
-    * User Interface mit Buttons (Datei laden, Animation beginnen (Animation weitergehen, Animation zurückgehen, Animation/Bild speichern))
-    * Datei (CSV) muss irgendwie geladen werden können
-* Animationsalgorithmus entwickeln und implementieren - 90% fertig (genauere Tests durchführen, Mutex einbauen)
+    * User Interface mit Buttons (Animation/Bild speichern, Animation automatisch abspielen)
+    * Button zum automatischen Abspielen der Animation (vielleicht mit Auswahl wie viel Zeit zwischen den Bildern sein soll)
+* Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
 * Semaphoren currentValue nicht nur auf 0 und 1, sondern auch über 1 hinaus setzen können
 
 MEDIUM-Priority:
