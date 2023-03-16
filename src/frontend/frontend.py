@@ -5,10 +5,10 @@ app = Flask(__name__)
 
 import generator
 
-# @app.route("/next")
-# def createNextImage():
-#     generator.getNextFrame()
-#     return(generator.getCurrentImage())
+@app.route("/next")
+def createNextImage():
+    generator.getNextFrame()
+    return(generator.getCurrentImage())
    
 # @app.route("/prev")
 # imageBuffer = []

@@ -59,7 +59,6 @@ def openFromCSV(content):
     
     erasePreviousData()
 
-    print("Type: " + str(type(content)))
     df = pd.read_csv(StringIO(content), sep=',')
 
     # split seperated values into list elements
@@ -429,4 +428,4 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    dot.render('rectangle_arrow', view=True,directory=None,outfile=None, format='svg')
+    return dot.pipe(format='svg')
