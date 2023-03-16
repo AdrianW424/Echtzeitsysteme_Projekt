@@ -1,7 +1,0 @@
-Task_ID,    Task_Name,  Activity_ID,    Activity_Name,  Activity_Duration,  Semaphore_ID,   Semaphore_Name, Semaphore_Initial_Value,    Mutex_ID,   Mutex_Name, Predecessor_Task_ID,    Predecessor_Activity_ID
-1,          Task1,      1,              Activity1,      5,                  ,               ,               ,                           ,           ,
-1,          Task1,      2,              Activity2,      3,                  Semaphore1,     Sem1,           1,                          ,           1,          1
-1,          Task1,      3,              Activity3,      2,                  Semaphore2,     Sem2,           0,                          Mutex1,     Mut1,       1,                      2
-2,          Task2,      4,              Activity4,      4,                  ,               ,               ,                           ,           ,
-2,          Task2,      5,              Activity5,      6,                  ,               ,               Semaphore1,                 Sem1,       ,           4
-3,          Task3,      6,              Activity6,      3,                  Semaphore2,     Sem2,           ,                           Mutex1,     Mut1,       5,                      5
