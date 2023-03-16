@@ -16,3 +16,6 @@ MEDIUM-Priority:
 
 LOW-Priority:
 * Programm unabhängig gegenüber falschen Eingaben in CSV-Datei machen
+
+TOTEST:
+* Mehrere Semaphoren mit unterschiedlichen Initialwert
