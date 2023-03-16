@@ -18,6 +18,80 @@ class Activity:
         self.mutexes = mutexes
         self.currentValue = 0
         self.currentDuration = duration
+        
+    def checkActivity(self, withAlreadyRunning=True):
+        # check if activity is already running or (if all incoming semaphores are active and all mutexes are free)
+        if withAlreadyRunning and (self.currentValue > 0 or (self.checkAllIncomingSemaphores() and self.checkAllIncomingMutexes())):
+            self.runActivity()
+        elif not withAlreadyRunning and self.checkAllIncomingSemaphores() and self.checkAllIncomingMutexes():
+            self.runActivity(withAlreadyRunning)
+        
+    def runActivity(self, withAlreadyRunning=True):
+        if withAlreadyRunning:
+            self.currentValue = 1
+            if self.currentDuration > 0:
+                self.currentDuration -= 1
+            else:
+                self.currentValue = 0
+                self.currentDuration = self.duration
+                self.releaseSemaphores()
+                self.releaseMutexes()
+                self.activateOutgoingSemaphores()
+        else:
+            if self.currentValue <= 0:
+                self.currentValue = 1
+                if self.currentDuration > 0:
+                    self.currentDuration -= 1
+                else:
+                    # possibility, if there is an activity with duration 0
+                    self.currentValue = 0
+                    self.currentDuration = self.duration
+                    self.releaseSemaphores()
+                    self.releaseMutexes()
+                    self.activateOutgoingSemaphores()
+            
+    
+    def checkAllIncomingSemaphores(self):
+        # check if all incoming semaphores are active
+        flag = True
+        semaphoresIN = self.semaphoresIN.copy()
+        
+        while flag and len(semaphoresIN) != 0:
+            semaphoreIN = semaphoresIN.pop(0)
+            # if there is a group, check if one of the semaphores is active
+            if len(semaphoreIN.groupWith) != 0:
+                if semaphoreIN.currentValue <= 0:
+                    for groupSemaphore in semaphoreIN.groupWith:
+                        if groupSemaphore.currentValue > 0:
+                            break
+                        
+                        if groupSemaphore == semaphoreIN.groupWith[-1]:
+                            flag = False
+                            break
+                if flag:
+                    for groupSemaphore in semaphoreIN.groupWith:
+                        semaphoresIN.remove(groupSemaphore)
+            elif semaphoreIN.currentValue == 0:
+                flag = False
+                break
+        
+        return flag
+
+    def checkAllIncomingMutexes(self):
+        # TODO: check if all incoming mutexes are free
+        return True
+    
+    def releaseSemaphores(self):
+        for semaphoreIN in self.semaphoresIN:
+                semaphoreIN.currentValue = 0
+    
+    def releaseMutexes(self):
+        # TODO: release all mutexes
+        pass
+    
+    def activateOutgoingSemaphores(self):
+        for semaphoreOUT in self.semaphoresOUT:
+            semaphoreOUT.currentValue = 1
 
 class Mutex:
     def __init__(self, ID, name, activities):
@@ -260,7 +334,25 @@ def createSemaphores():
                     dummyCounter += 1
                 else:
                     dot.edge(str(semaphore.activityOUT.ID), str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
+
+def getNextFrame():
+    # try to initialize semaphores
+    startPoints = getAllStartPoints()
+    
+    for startPoint in startPoints:
+        if startPoint.currentValue <= 0:
+            startPoint.currentValue = 1
+            startPoint.initialValue -= 1
             
+    # activities sorted by ID
+    activitiesSorted = sorted(activities, key=lambda activity: activity.ID)
+    
+    for activity in activitiesSorted:
+        activity.checkActivity()
+
+    for activity in activitiesSorted[::-1][1:]:
+        activity.checkActivity(False)
+
 historySemaphores = []
 
 def getAllStartPoints():
@@ -271,119 +363,6 @@ def getAllStartPoints():
             startPoints.append(semaphore)
             
     return startPoints
-
-def getActiveSemaphores():
-    activeSemaphores = []
-    for semaphore in semaphores:
-        if semaphore.currentValue > 0:
-            activeSemaphores.append(semaphore)
-            
-    return activeSemaphores
-
-def getActiveActivities():
-    activeActivities = []
-    for activity in activities:
-        if activity.currentValue > 0:
-            activeActivities.append(activity)
-            
-    return activeActivities
-
-def getNextFrame():
-    # create a new image with highlighted nodes and edges (Tasks/Activities, Semaphores)
-    flagFinished = False # if activity finished -> False
-    startPoints = getAllStartPoints()
-    
-    # check if you can activate a new semaphore
-    for startPoint in startPoints:
-        if startPoint.currentValue <= 0:
-            startPoint.currentValue = 1
-            startPoint.initialValue -= 1
-        # else: do nothing - wait for the semaphore to become free
-        
-    activeSemaphores = getActiveSemaphores()
-        
-    # check for the activities behind the active semaphores
-    for activeSemaphore in activeSemaphores:
-        # look, if the following activity is ready to run (all incoming semaphores == 1) or already running
-        if activeSemaphore.activityIN.currentValue <= 0:
-            # check if all incoming semaphores are active
-            
-            flag = True
-            semaphoresIN = activeSemaphore.activityIN.semaphoresIN.copy()
-            
-            while flag and len(semaphoresIN) != 0:
-                semaphoreIN = semaphoresIN.pop(0)
-                # if there is a group, check if one of the semaphores is active
-                if len(semaphoreIN.groupWith) != 0:
-                    if semaphoreIN.currentValue <= 0:
-                        for groupSemaphore in semaphoreIN.groupWith:
-                            if groupSemaphore.currentValue > 0:
-                                break
-                            
-                            if groupSemaphore == semaphoreIN.groupWith[-1]:
-                                flag = False
-                                break
-                    if flag:
-                        for groupSemaphore in semaphoreIN.groupWith:
-                            semaphoresIN.remove(groupSemaphore)
-                elif semaphoreIN.currentValue == 0:
-                    flag = False
-                    break
-            
-            if flag:
-                activeSemaphore.activityIN.currentValue = 1
-                
-                
-    activeActivities = getActiveActivities()
-    
-    for activeActivity in activeActivities:
-        if activeActivity.currentDuration <= 0:
-            # next steps: activate all semaphores going out of the activity
-            semaphoresIN = activeActivity.semaphoresIN
-            for semaphoreIN in semaphoresIN:
-                semaphoreIN.currentValue = 0
-            activeActivity.currentValue = 0
-            semaphoresOUT = activeActivity.semaphoresOUT
-            for semaphoreOUT in semaphoresOUT:
-                semaphoreOUT.currentValue = 1
-            flagFinished = True
-            activeActivity.currentDuration = activeActivity.duration
-        else:
-            activeActivity.currentDuration -= 1
-            
-    if flagFinished:
-        activeSemaphores = getActiveSemaphores()
-        # check for the activities behind the active semaphores
-        for activeSemaphore in activeSemaphores:
-            # look, if the following activity is ready to run (all incoming semaphores == 1) or already running
-            if activeSemaphore.activityIN.currentValue <= 0:
-                # check if all incoming semaphores are active
-                
-                flag = True
-                semaphoresIN = activeSemaphore.activityIN.semaphoresIN.copy()
-                
-                while flag and len(semaphoresIN) != 0:
-                    semaphoreIN = semaphoresIN.pop(0)
-                    # if there is a group, check if one of the semaphores is active
-                    if len(semaphoreIN.groupWith) != 0:
-                        if semaphoreIN.currentValue <= 0:
-                            for groupSemaphore in semaphoreIN.groupWith:
-                                if groupSemaphore.currentValue > 0:
-                                    break
-                                
-                                if groupSemaphore == semaphoreIN.groupWith[-1]:
-                                    flag = False
-                                    break
-                        if flag:
-                            for groupSemaphore in semaphoreIN.groupWith:
-                                semaphoresIN.remove(groupSemaphore)
-                    elif semaphoreIN.currentValue == 0:
-                        flag = False
-                        break
-                
-                if flag:
-                    activeSemaphore.activityIN.currentValue = 1
-                    activeSemaphore.activityIN.currentDuration -= 1
 
 def saveInitialValuesSemaphores():
     # save the initial values of all semaphores
