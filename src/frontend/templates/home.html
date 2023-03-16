@@ -77,23 +77,23 @@
         document.getElementById("img-viewer").style.display = "block";
     });
 
-    document.getElementById("btn-file").addEventListener('click', function() {
+    document.getElementById("btn-file").addEventListener('click', function () {
         const input = document.createElement('input');
         input.type = 'file';
         input.addEventListener('change', () => {
-            const file = input.files[0].path;
+            const file = input.files[0];
             const formData = new FormData();
             formData.append('file', file);
             fetch('/process_file', {
                 method: 'POST',
                 body: formData
             })
-            // .then(response => response.arrayBuffer())
-            // .then(data => {
-            //     const blob = new Blob([data], { type: 'image/svg+xml' });
-            //     const url = URL.createObjectURL(blob);
-            //     document.getElementById('img-viewer').src = url;
-            // });
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const blob = new Blob([data], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                document.getElementById('img-viewer').src = url;
+            });
         });
         input.click();
     });

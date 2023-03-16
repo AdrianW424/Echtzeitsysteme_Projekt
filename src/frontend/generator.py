@@ -1,5 +1,13 @@
 import pandas as pd
 import graphviz as gv
+from io import StringIO
+
+# only for tests
+import pickle
+#
+
+def printt(text):
+    print(text)
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -47,12 +55,12 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
-def openFromCSV(dataFilePath):
+def openFromCSV(content):
+    
+    erasePreviousData()
 
-    data = []
-    linecells = []
-
-    df = pd.read_csv(dataFilePath, sep=',')
+    print("Type: " + str(type(content)))
+    df = pd.read_csv(StringIO(content), sep=',')
 
     # split seperated values into list elements
     df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
@@ -69,6 +77,10 @@ def openFromCSV(dataFilePath):
     df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
 
     # only during the creation process of the tree
+    
+    with open('file.pkl', 'wb') as file:
+    # A new file will be created
+        pickle.dump(df, file)
 
     for index, row in df.iterrows():
         # first: instantiation of objects
@@ -113,7 +125,7 @@ def openFromCSV(dataFilePath):
         while len(buf) > 0:
             semaphore_id = buf.pop(0)
             # if start equals '[' -> start of or)
-            if semaphore_id == '[':
+            if semaphore_id[0] == '[':
                 semaphore_id = semaphore_id[1:]
                 
                 if semaphore_id[-1] == ']':
@@ -140,6 +152,17 @@ def openFromCSV(dataFilePath):
             else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+                
+def erasePreviousData():
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs
+    activities = []
+    activities_IDs = []
+    tasks = []
+    tasks_IDs = []
+    semaphores = []
+    semaphore_IDs = []
+    mutexs = []
+    mutex_IDs = []
                 
 dummyCounter = 0
 
@@ -406,4 +429,4 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    dot.render('rectangle_arrow', view=False,directory=None,outfile=None, format='svg')
+    dot.render('rectangle_arrow', view=True,directory=None,outfile=None, format='svg')

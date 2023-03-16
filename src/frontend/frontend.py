@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+import os
+
 app = Flask(__name__)
 
 import generator
@@ -20,10 +22,13 @@ import generator
 
 @app.route("/process_file", methods=['POST'])
 def loadCSVFile():
-    path = request.form.get('file')
-    print("PATH: " + path)
-    generator.openFromCSV(path)
-    return(generator.getCurrentImage)
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            content = file.read().decode('utf-8')
+            generator.openFromCSV(content)
+            return(generator.getCurrentImage())
+    return "Error", 400
 
 @app.route("/")
 def home():
