@@ -20,8 +20,8 @@ import generator
 
 @app.route("/process_file", methods=['POST'])
 def loadCSVFile():
-    path = request.form.get('path')
-    print(path)
+    path = request.form.get('file')
+    print("PATH: " + path)
     generator.openFromCSV(path)
     return(generator.getCurrentImage)
 
