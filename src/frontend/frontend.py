@@ -5,7 +5,7 @@ import generator
 
 
 @app.route("/next")
-def createNextFrame():
+def createNextImage():
     generator.getNextFrame()
     return(generator.getCurrentImage())
    

@@ -397,7 +397,7 @@ def reinitializeInitialValuesSemaphores():
         semaphores[semaphore_IDs.index(valorem[0])].initialValue = valorem[1]
 
 # just a helper method
-def createNextFrame():
+def createNextImage():
     getNextFrame()
     getCurrentImage()
     
