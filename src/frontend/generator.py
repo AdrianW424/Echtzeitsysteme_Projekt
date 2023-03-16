@@ -1,4 +1,5 @@
 import pandas as pd
+import graphviz as gv
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -50,7 +51,6 @@ def openFromCSV(dataFilePath):
 
     data = []
     linecells = []
-
 
     df = pd.read_csv(dataFilePath, sep=',')
 
@@ -145,8 +145,7 @@ def openFromCSV(dataFilePath):
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
                 print(semaphore_id)
                 
-    import graphviz as gv
-    dummyCounter = 0
+dummyCounter = 0
 
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
