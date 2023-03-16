@@ -79,7 +79,6 @@ def openFromCSV(dataFilePath):
         if row["Activity_ID"] not in activities_IDs:
             activities_IDs.append(row["Activity_ID"])
             activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
-            print(row["Predecessor_Semaphore_ID"])
         
         # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
         for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
@@ -121,7 +120,6 @@ def openFromCSV(dataFilePath):
                     semaphore_id = semaphore_id[:-1]
                     activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                     semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                    print(semaphore_id)
                 else:
                     semaphore_ids = []
                     while semaphore_id[-1] != ']':
@@ -135,7 +133,6 @@ def openFromCSV(dataFilePath):
                         for semaphore in semaphore_ids:
                             if not semaphore == semaphore_id:
                                 semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
-                    print(semaphore_ids)
             
             # if end equals ']' -> end of or)
             
@@ -143,7 +140,6 @@ def openFromCSV(dataFilePath):
             else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                print(semaphore_id)
                 
 dummyCounter = 0
 
