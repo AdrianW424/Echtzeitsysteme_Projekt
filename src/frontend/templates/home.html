@@ -10,7 +10,7 @@
     </h1></center>
     <center>
         <div class="pngviewer">
-            <img id="img-viewer" src="{{url_for('static', filename='current_frame.jpg')}}" style="width: 90vw; height: 84vh;"/>
+            <img id="img-viewer" src="" style="width: 90vw; height: 84vh; display: none"/>
         </div>
     </center>
 </body>
@@ -73,45 +73,48 @@
 </style>
 
 <script>
+    document.getElementById("img-viewer").addEventListener('change', function() {
+        document.getElementById("img-viewer").style.display = "block";
+    });
+
     document.getElementById("btn-file").addEventListener('click', function() {
         const input = document.createElement('input');
         input.type = 'file';
         input.addEventListener('change', () => {
-            const file = input.files[0];
-            const path = URL.createObjectURL(file);
-            console.log(`Selected file: ${path}`); // <-- this is the path you want 
+            const file = input.files[0].path;
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch('/process_file', {
+                method: 'POST',
+                body: formData
+            })
+            // .then(response => response.arrayBuffer())
+            // .then(data => {
+            //     const blob = new Blob([data], { type: 'image/svg+xml' });
+            //     const url = URL.createObjectURL(blob);
+            //     document.getElementById('img-viewer').src = url;
+            // });
         });
         input.click();
-        alert()
-    })
+    });
 
     document.getElementById("btn-backward").addEventListener('click', function() {
         fetch('/prev')
             .then(response => response.arrayBuffer())
             .then(data => {
-                // Convert the byte array to a Blob
                 const blob = new Blob([data], { type: 'image/svg+xml' });
-
-                // Create a URL for the Blob
                 const url = URL.createObjectURL(blob);
-
-                // Set the URL as the source of the img tag
                 document.getElementById('img-viewer').src = url;
             });
-    })
+    });
 
     document.getElementById("btn-forward").addEventListener('click', function() {
         fetch('/next')
             .then(response => response.arrayBuffer())
             .then(data => {
-                // Convert the byte array to a Blob
                 const blob = new Blob([data], { type: 'image/svg+xml' });
-
-                // Create a URL for the Blob
                 const url = URL.createObjectURL(blob);
-
-                // Set the URL as the source of the img tag
                 document.getElementById('img-viewer').src = url;
             });
-    })
+    });
 </script>

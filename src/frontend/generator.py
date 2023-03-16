@@ -113,7 +113,7 @@ def openFromCSV(dataFilePath):
         while len(buf) > 0:
             semaphore_id = buf.pop(0)
             # if start equals '[' -> start of or)
-            if semaphore_id[0] == '[':
+            if semaphore_id == '[':
                 semaphore_id = semaphore_id[1:]
                 
                 if semaphore_id[-1] == ']':
@@ -406,4 +406,4 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    dot.render('rectangle_arrow', view=True, format='svg')
+    dot.render('rectangle_arrow', view=False,directory=None,outfile=None, format='svg')
