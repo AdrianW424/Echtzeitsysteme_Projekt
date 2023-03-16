@@ -1,5 +1,6 @@
 import pandas as pd
 import graphviz as gv
+from io import StringIO
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -16,107 +17,14 @@ class Activity:
         self.semaphoresIN = semaphoresIN
         self.semaphoresOUT = semaphoresOUT
         self.mutexes = mutexes
-        self.pickedMutexes = []
         self.currentValue = 0
         self.currentDuration = duration
-        
-    def checkActivity(self, withAlreadyRunning=True):
-        # check if activity is already running or (if all incoming semaphores are active and all mutexes are free)
-        if withAlreadyRunning and (self.currentValue > 0 or self.checkAllIncomingSemaphores()):
-            # pick mutexes
-            if self.checkAllMutexes():
-                self.runActivity()
-        elif not withAlreadyRunning and self.checkAllIncomingSemaphores():
-            # pick mutexes
-            if self.checkAllMutexes():
-                self.runActivity(withAlreadyRunning)
-        
-    def runActivity(self, withAlreadyRunning=True):
-        if withAlreadyRunning:
-            self.currentValue = 1
-            if self.currentDuration > 0:
-                self.currentDuration -= 1
-            else:
-                self.currentValue = 0
-                self.currentDuration = self.duration
-                self.releaseSemaphores()
-                self.releaseMutexes()
-                self.activateOutgoingSemaphores()
-        else:
-            if self.currentValue <= 0:
-                self.currentValue = 1
-                if self.currentDuration > 0:
-                    self.currentDuration -= 1
-                else:
-                    # possibility, if there is an activity with duration 0
-                    self.currentValue = 0
-                    self.currentDuration = self.duration
-                    self.releaseSemaphores()
-                    self.releaseMutexes()
-                    self.activateOutgoingSemaphores()
-            
-    
-    def checkAllIncomingSemaphores(self):
-        # check if all incoming semaphores are active
-        flag = True
-        semaphoresIN = self.semaphoresIN.copy()
-        
-        while flag and len(semaphoresIN) != 0:
-            semaphoreIN = semaphoresIN.pop(0)
-            # if there is a group, check if one of the semaphores is active
-            if len(semaphoreIN.groupWith) != 0:
-                if semaphoreIN.currentValue <= 0:
-                    for groupSemaphore in semaphoreIN.groupWith:
-                        if groupSemaphore.currentValue > 0:
-                            break
-                        
-                        if groupSemaphore == semaphoreIN.groupWith[-1]:
-                            flag = False
-                            break
-                if flag:
-                    for groupSemaphore in semaphoreIN.groupWith:
-                        semaphoresIN.remove(groupSemaphore)
-            elif semaphoreIN.currentValue == 0:
-                flag = False
-                break
-        
-        return flag
-
-    def checkAllMutexes(self):
-        # TODO: check if all incoming mutexes are free or picked by this activity
-        for mutex in self.mutexes:
-            if mutex.pickedBy != None and mutex.pickedBy != self:
-                return False
-        
-        for mutex in self.mutexes:
-            if mutex not in self.pickedMutexes:
-                self.pickMutex(mutex)
-        # return true if all mutexes could be picked
-        return True
-    
-    def releaseSemaphores(self):
-        for semaphoreIN in self.semaphoresIN:
-                semaphoreIN.currentValue = 0
-    
-    def releaseMutexes(self):
-        for mutex in self.pickedMutexes:
-            mutex.pickedBy = None
-        self.pickedMutexes = []
-            
-    def pickMutex(self, mutex):
-        self.pickedMutexes.append(mutex)
-        mutex.pickedBy = self
-    
-    def activateOutgoingSemaphores(self):
-        for semaphoreOUT in self.semaphoresOUT:
-            semaphoreOUT.currentValue = 1
 
 class Mutex:
     def __init__(self, ID, name, activities):
         self.ID = ID
         self.name = name
         self.activities = activities
-        self.pickedBy = None
 
 class Semaphore:
     def __init__(self, ID, name, groupWith, initialValue, activityIN, activityOUT):
@@ -140,12 +48,11 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
-def openFromCSV(dataFilePath):
+def openFromCSV(content):
+    
+    erasePreviousData()
 
-    data = []
-    linecells = []
-
-    df = pd.read_csv(dataFilePath, sep=',')
+    df = pd.read_csv(StringIO(content), sep=',')
 
     # split seperated values into list elements
     df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
@@ -162,6 +69,10 @@ def openFromCSV(dataFilePath):
     df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
 
     # only during the creation process of the tree
+    
+    with open('file.pkl', 'wb') as file:
+    # A new file will be created
+        pickle.dump(df, file)
 
     for index, row in df.iterrows():
         # first: instantiation of objects
@@ -172,7 +83,6 @@ def openFromCSV(dataFilePath):
         if row["Activity_ID"] not in activities_IDs:
             activities_IDs.append(row["Activity_ID"])
             activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
-            print(row["Predecessor_Semaphore_ID"])
         
         # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
         for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
@@ -214,7 +124,6 @@ def openFromCSV(dataFilePath):
                     semaphore_id = semaphore_id[:-1]
                     activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                     semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                    print(semaphore_id)
                 else:
                     semaphore_ids = []
                     while semaphore_id[-1] != ']':
@@ -228,7 +137,6 @@ def openFromCSV(dataFilePath):
                         for semaphore in semaphore_ids:
                             if not semaphore == semaphore_id:
                                 semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
-                    print(semaphore_ids)
             
             # if end equals ']' -> end of or)
             
@@ -236,7 +144,17 @@ def openFromCSV(dataFilePath):
             else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                print(semaphore_id)
+                
+def erasePreviousData():
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs
+    activities = []
+    activities_IDs = []
+    tasks = []
+    tasks_IDs = []
+    semaphores = []
+    semaphore_IDs = []
+    mutexs = []
+    mutex_IDs = []
                 
 dummyCounter = 0
 
@@ -253,13 +171,13 @@ def createRects():
         color = ACTIVITY_IDLE
         if activity.currentValue > 0:
             color = ACTIVITY_RUNNING
-        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', fillcolor=color)
+        dot.node(str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', fillcolor=color)
         
 def createMutexs():
     for mutex in mutexs:
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name)
+        dot.node(str(mutex.ID), shape='polygon', sides='5', label=mutex.name)
         for activity in mutex.activities:
-            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline')
+            dot.edge(str(mutex.ID), str(activity.ID), arrowhead='none', style='dashed', splines='polyline')
         
 def createSemaphores():
     global dummyCounter
@@ -289,7 +207,7 @@ def createSemaphores():
             if semaphore.initialValue > 0:
                     # this is the edge with a point in the middle
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
+                    dot.edge(str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                     
@@ -298,7 +216,7 @@ def createSemaphores():
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
                     dummyCounter += 1
             else:
-                dot.edge("Activity"+str(semaphore.activityOUT.ID), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color)
+                dot.edge(str(semaphore.activityOUT.ID), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color)
             
             # after the groupSemaphores
             colorOfLastSemaphore = color
@@ -312,7 +230,7 @@ def createSemaphores():
                 if groupSemaphore.initialValue > 0:
                     # this is the edge with a point in the middle
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
-                    dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
+                    dot.edge(str(groupSemaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                     
@@ -321,12 +239,12 @@ def createSemaphores():
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color)
+                    dot.edge(str(groupSemaphore.activityOUT.ID), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color)
                 
                 semaphores_buf.remove(groupSemaphore)
                 
             dot.node(middleDummyName, shape='point', width="0.01", height="0.01", color=colorOfLastSemaphore)
-            dot.edge(middleDummyName, "Activity"+str(semaphore.activityIN.ID), arrowhead='normal', splines='polyline', color=colorOfLastSemaphore)
+            dot.edge(middleDummyName, str(semaphore.activityIN.ID), arrowhead='normal', splines='polyline', color=colorOfLastSemaphore)
             
         else:
             # if semaphore is leading to the same task where it came from, use another arrowhead
@@ -334,44 +252,26 @@ def createSemaphores():
                 # if semaphore has an initial value, connect an edge to the semaphore
                 if semaphore.initialValue > 0:
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color)
+                    dot.edge(str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
+                    dot.edge("Dummy" + str(dummyCounter), str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color)
                     dummyCounter += 1
                     dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue))
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color)
+                    dot.edge(str(semaphore.activityOUT.ID), str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color)
             else:
                 if semaphore.initialValue > 0:
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
+                    dot.edge(str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
+                    dot.edge("Dummy" + str(dummyCounter), str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
                     dummyCounter += 1
                     dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue))
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
-
-def getNextFrame():
-    # try to initialize semaphores
-    startPoints = getAllStartPoints()
-    
-    for startPoint in startPoints:
-        if startPoint.currentValue <= 0:
-            startPoint.currentValue = 1
-            startPoint.initialValue -= 1
+                    dot.edge(str(semaphore.activityOUT.ID), str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
             
-    # activities sorted by ID
-    activitiesSorted = sorted(activities, key=lambda activity: activity.ID)
-    
-    for activity in activitiesSorted:
-        activity.checkActivity()
-
-    for activity in activitiesSorted[:-1]:
-        activity.checkActivity(False)
-
 historySemaphores = []
 
 def getAllStartPoints():
@@ -382,6 +282,119 @@ def getAllStartPoints():
             startPoints.append(semaphore)
             
     return startPoints
+
+def getActiveSemaphores():
+    activeSemaphores = []
+    for semaphore in semaphores:
+        if semaphore.currentValue > 0:
+            activeSemaphores.append(semaphore)
+            
+    return activeSemaphores
+
+def getActiveActivities():
+    activeActivities = []
+    for activity in activities:
+        if activity.currentValue > 0:
+            activeActivities.append(activity)
+            
+    return activeActivities
+
+def getNextFrame():
+    # create a new image with highlighted nodes and edges (Tasks/Activities, Semaphores)
+    flagFinished = False # if activity finished -> False
+    startPoints = getAllStartPoints()
+    
+    # check if you can activate a new semaphore
+    for startPoint in startPoints:
+        if startPoint.currentValue <= 0:
+            startPoint.currentValue = 1
+            startPoint.initialValue -= 1
+        # else: do nothing - wait for the semaphore to become free
+        
+    activeSemaphores = getActiveSemaphores()
+        
+    # check for the activities behind the active semaphores
+    for activeSemaphore in activeSemaphores:
+        # look, if the following activity is ready to run (all incoming semaphores == 1) or already running
+        if activeSemaphore.activityIN.currentValue <= 0:
+            # check if all incoming semaphores are active
+            
+            flag = True
+            semaphoresIN = activeSemaphore.activityIN.semaphoresIN.copy()
+            
+            while flag and len(semaphoresIN) != 0:
+                semaphoreIN = semaphoresIN.pop(0)
+                # if there is a group, check if one of the semaphores is active
+                if len(semaphoreIN.groupWith) != 0:
+                    if semaphoreIN.currentValue <= 0:
+                        for groupSemaphore in semaphoreIN.groupWith:
+                            if groupSemaphore.currentValue > 0:
+                                break
+                            
+                            if groupSemaphore == semaphoreIN.groupWith[-1]:
+                                flag = False
+                                break
+                    if flag:
+                        for groupSemaphore in semaphoreIN.groupWith:
+                            semaphoresIN.remove(groupSemaphore)
+                elif semaphoreIN.currentValue == 0:
+                    flag = False
+                    break
+            
+            if flag:
+                activeSemaphore.activityIN.currentValue = 1
+                
+                
+    activeActivities = getActiveActivities()
+    
+    for activeActivity in activeActivities:
+        if activeActivity.currentDuration <= 0:
+            # next steps: activate all semaphores going out of the activity
+            semaphoresIN = activeActivity.semaphoresIN
+            for semaphoreIN in semaphoresIN:
+                semaphoreIN.currentValue = 0
+            activeActivity.currentValue = 0
+            semaphoresOUT = activeActivity.semaphoresOUT
+            for semaphoreOUT in semaphoresOUT:
+                semaphoreOUT.currentValue = 1
+            flagFinished = True
+            activeActivity.currentDuration = activeActivity.duration
+        else:
+            activeActivity.currentDuration -= 1
+            
+    if flagFinished:
+        activeSemaphores = getActiveSemaphores()
+        # check for the activities behind the active semaphores
+        for activeSemaphore in activeSemaphores:
+            # look, if the following activity is ready to run (all incoming semaphores == 1) or already running
+            if activeSemaphore.activityIN.currentValue <= 0:
+                # check if all incoming semaphores are active
+                
+                flag = True
+                semaphoresIN = activeSemaphore.activityIN.semaphoresIN.copy()
+                
+                while flag and len(semaphoresIN) != 0:
+                    semaphoreIN = semaphoresIN.pop(0)
+                    # if there is a group, check if one of the semaphores is active
+                    if len(semaphoreIN.groupWith) != 0:
+                        if semaphoreIN.currentValue <= 0:
+                            for groupSemaphore in semaphoreIN.groupWith:
+                                if groupSemaphore.currentValue > 0:
+                                    break
+                                
+                                if groupSemaphore == semaphoreIN.groupWith[-1]:
+                                    flag = False
+                                    break
+                        if flag:
+                            for groupSemaphore in semaphoreIN.groupWith:
+                                semaphoresIN.remove(groupSemaphore)
+                    elif semaphoreIN.currentValue == 0:
+                        flag = False
+                        break
+                
+                if flag:
+                    activeSemaphore.activityIN.currentValue = 1
+                    activeSemaphore.activityIN.currentDuration -= 1
 
 def saveInitialValuesSemaphores():
     # save the initial values of all semaphores
@@ -408,4 +421,4 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    dot.render('rectangle_arrow', view=True, format='svg')
+    return dot.pipe(format='svg')
