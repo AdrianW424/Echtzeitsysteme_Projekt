@@ -2,13 +2,6 @@ import pandas as pd
 import graphviz as gv
 from io import StringIO
 
-# only for tests
-import pickle
-#
-
-def printt(text):
-    print(text)
-
 class Task:
     def __init__(self, ID, name, activities):
         self.ID = ID
