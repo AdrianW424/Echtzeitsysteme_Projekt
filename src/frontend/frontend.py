@@ -23,7 +23,8 @@ def createNextImage():
 def getPrevImage():
     global position
     global imageBuffer
-    position -= 1
+    if (position > 0):
+        position -= 1
     if position >= 0:
         return imageBuffer[position]
     position = 0
