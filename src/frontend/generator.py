@@ -1,16 +1,6 @@
 import pandas as pd
 import graphviz as gv
 from io import StringIO
-<<<<<<< HEAD
-
-# only for tests
-import pickle
-#
-
-def printt(text):
-    print(text)
-=======
->>>>>>> 4fa62ae0853209bddba3aef5c8f80a1bfb35ce54
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -79,10 +69,6 @@ def openFromCSV(content):
     df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
 
     # only during the creation process of the tree
-    
-    with open('file.pkl', 'wb') as file:
-    # A new file will be created
-        pickle.dump(df, file)
 
     for index, row in df.iterrows():
         # first: instantiation of objects
