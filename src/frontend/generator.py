@@ -1,5 +1,13 @@
 import pandas as pd
 import graphviz as gv
+from io import StringIO
+
+# only for tests
+import pickle
+#
+
+def printt(text):
+    print(text)
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -140,12 +148,11 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
-def openFromCSV(dataFilePath):
+def openFromCSV(content):
+    
+    erasePreviousData()
 
-    data = []
-    linecells = []
-
-    df = pd.read_csv(dataFilePath, sep=',')
+    df = pd.read_csv(StringIO(content), sep=',')
 
     # split seperated values into list elements
     df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
@@ -162,6 +169,10 @@ def openFromCSV(dataFilePath):
     df["Mutex_Name"] = df["Mutex_Name"].str.split(";")
 
     # only during the creation process of the tree
+    
+    with open('file.pkl', 'wb') as file:
+    # A new file will be created
+        pickle.dump(df, file)
 
     for index, row in df.iterrows():
         # first: instantiation of objects
@@ -172,7 +183,6 @@ def openFromCSV(dataFilePath):
         if row["Activity_ID"] not in activities_IDs:
             activities_IDs.append(row["Activity_ID"])
             activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
-            print(row["Predecessor_Semaphore_ID"])
         
         # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
         for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
@@ -214,7 +224,6 @@ def openFromCSV(dataFilePath):
                     semaphore_id = semaphore_id[:-1]
                     activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                     semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                    print(semaphore_id)
                 else:
                     semaphore_ids = []
                     while semaphore_id[-1] != ']':
@@ -228,7 +237,6 @@ def openFromCSV(dataFilePath):
                         for semaphore in semaphore_ids:
                             if not semaphore == semaphore_id:
                                 semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
-                    print(semaphore_ids)
             
             # if end equals ']' -> end of or)
             
@@ -236,7 +244,17 @@ def openFromCSV(dataFilePath):
             else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                print(semaphore_id)
+                
+def erasePreviousData():
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs
+    activities = []
+    activities_IDs = []
+    tasks = []
+    tasks_IDs = []
+    semaphores = []
+    semaphore_IDs = []
+    mutexs = []
+    mutex_IDs = []
                 
 dummyCounter = 0
 
@@ -408,4 +426,4 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    dot.render('rectangle_arrow', view=True, format='svg')
+    return dot.pipe(format='svg')

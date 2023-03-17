@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html id="html">
 <head>
     <title>Home</title>
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
-<body>
+<body id="body">
     <center><h1>
         Flowchart Viewer
     </h1></center>
     <center>
-        <div class="pngviewer">
-            <img id="img-viewer" src="{{url_for('static', filename='current_frame.jpg')}}" style="width: 90vw; height: 84vh;"/>
+        <div class="pngviewer" id="pngviewer" style="display: none" onchange="this.style.display = block;">
+            <img id="img-viewer" src="" style="width: 90vw; height: 84vh"/>
         </div>
     </center>
 </body>
 <footer>
-    <div class="task-bar">
+    <div class="task-bar" id="task-bar">
         <div class="task-bar-container">
-            <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i></button>
-            <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i></i></button>
-            <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i></button>
-            <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i></button>
+            <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i><br>Load CSV</button>
+            <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i><br>Backward</i></button>
+            <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i><br>Forward</button>
+            <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i><br>Save Image</button>
+            <button class="btn btn-darkmode" id="btn-darkmode"><i id="toggle" class="fa fa-toggle-off"></i><br>Darkmode</button>
         </div>
     </div>
 </footer>
@@ -29,14 +30,15 @@
 <style>
     html {
         font-family: arial;
+        background-color: #eee;
     }
     .task-bar {
         position: fixed;
-        background-color: #eee;
+        background-color: #ccc;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 50px;
+        height: auto;
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -49,19 +51,24 @@
     }
 
     .btn {
-        width: 100px;
-        height: 30px;
+        width: 150px;
+        height: 60px;
         margin-left: 10px;
         margin-right: 10px;
-        background-color: #ddd;        border: none;
+        background-color: #ddd;
+        border: none;
         border-radius: 5px;
         color: #000;
         font-size: 16px;
         font-weight: bold;
         cursor: pointer;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        margin-left: 20px;
+        margin-right: 20px;
     }
     .btn:hover {
-        background-color: #ccc;
+        background-color: #3c6aae;
     }
 
     .pngviewer {
@@ -73,45 +80,77 @@
 </style>
 
 <script>
-    document.getElementById("btn-file").addEventListener('click', function() {
+    document.getElementById("img-viewer").addEventListener('load', function() {
+        document.getElementById("img-viewer").style.display = "block";
+    });
+
+    document.getElementById("btn-file").addEventListener('click', function () {
         const input = document.createElement('input');
         input.type = 'file';
         input.addEventListener('change', () => {
             const file = input.files[0];
-            const path = URL.createObjectURL(file);
-            console.log(`Selected file: ${path}`); // <-- this is the path you want 
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch('/process_file', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const blob = new Blob([data], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                document.getElementById('img-viewer').src = url;
+            });
         });
         input.click();
-        alert()
-    })
+    });
 
     document.getElementById("btn-backward").addEventListener('click', function() {
         fetch('/prev')
             .then(response => response.arrayBuffer())
             .then(data => {
-                // Convert the byte array to a Blob
                 const blob = new Blob([data], { type: 'image/svg+xml' });
-
-                // Create a URL for the Blob
                 const url = URL.createObjectURL(blob);
-
-                // Set the URL as the source of the img tag
                 document.getElementById('img-viewer').src = url;
             });
-    })
+    });
 
     document.getElementById("btn-forward").addEventListener('click', function() {
         fetch('/next')
             .then(response => response.arrayBuffer())
             .then(data => {
-                // Convert the byte array to a Blob
                 const blob = new Blob([data], { type: 'image/svg+xml' });
-
-                // Create a URL for the Blob
                 const url = URL.createObjectURL(blob);
-
-                // Set the URL as the source of the img tag
                 document.getElementById('img-viewer').src = url;
             });
-    })
+    });
+
+    var darkmode = false;
+    document.getElementById("btn-darkmode").addEventListener('click', function() {
+        if (darkmode == true) {
+            document.getElementById("toggle").classList.remove("fa-toggle-on");
+            document.getElementById("toggle").classList.add("fa-toggle-off");
+            darkmode = false;
+            document.getElementById("html").style.backgroundColor = "#eee";
+            document.getElementById("html").style.color = "black";
+            document.getElementById("task-bar").style.backgroundColor = "#ccc";
+            document.getElementById("task-bar").color = "black";
+            var btns = document.getElementsByClassName("btn");
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.backgroundColor = '#ddd';
+            }
+        } else {
+            document.getElementById("toggle").classList.remove("fa-toggle-off");
+            document.getElementById("toggle").classList.add("fa-toggle-on");
+            darkmode = true;
+            document.getElementById("html").style.backgroundColor = "#111";
+            document.getElementById("html").style.color = "white";
+            document.getElementById("task-bar").style.backgroundColor = "#333";
+            document.getElementById("task-bar").color = "white";
+            var btns = document.getElementsByClassName("btn");
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.backgroundColor = '#222'; 
+            }
+        }
+    });
 </script>
