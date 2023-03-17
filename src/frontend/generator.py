@@ -141,11 +141,15 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
-def openFromCSV(content):
+def openFromCSV(content=None, Path=None):
+    # content for real use, Path for testing and development
     
     erasePreviousData()
 
-    df = pd.read_csv(StringIO(content), sep=',')
+    if content != None:
+        df = pd.read_csv(StringIO(content), sep=',')
+    else:
+        df = pd.read_csv(Path, sep=',')
 
     # split seperated values into list elements
     df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
@@ -254,25 +258,24 @@ dummyCounter = 0
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
 ACTIVITY_RUNNING = 'green'
-ACTIVITY_IDLE = 'white'
-
 SEMAPHORE_ACTIVE = 'red'
-SEMAPHORE_BLOCKING = 'black'
 
-def createRects():
+def createRects(color, inverseColor):
     for activity in activities:
-        color = ACTIVITY_IDLE
+        fillcolor = color
+        fontcolor = inverseColor
         if activity.currentValue > 0:
-            color = ACTIVITY_RUNNING
-        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', fillcolor=color)
+            fillcolor = ACTIVITY_RUNNING
+            fontcolor = 'black'
+        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor=fillcolor)
         
-def createMutexs():
+def createMutexs(color, inverseColor):
     for mutex in mutexs:
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name)
+        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=inverseColor, fillcolor=color)
         for activity in mutex.activities:
-            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline')
+            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=inverseColor)
         
-def createSemaphores():
+def createSemaphores(color, inverseColor):
     global dummyCounter
     
     # add color just like in createRects
@@ -282,7 +285,7 @@ def createSemaphores():
         
         semaphore = semaphores_buf.pop(0)
         
-        color = SEMAPHORE_BLOCKING
+        color = inverseColor
         if semaphore.currentValue > 0:
             color = SEMAPHORE_ACTIVE
             
@@ -301,15 +304,15 @@ def createSemaphores():
                     # this is the edge with a point in the middle
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color)
+                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
                     
                     # this is this init-thing (edge with point at the end)
-                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue))
-                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
+                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue), color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
             else:
-                dot.edge("Activity"+str(semaphore.activityOUT.ID), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color)
+                dot.edge("Activity"+str(semaphore.activityOUT.ID), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
             
             # after the groupSemaphores
             colorOfLastSemaphore = color
@@ -318,21 +321,21 @@ def createSemaphores():
                     color = SEMAPHORE_ACTIVE
                     colorOfLastSemaphore = SEMAPHORE_ACTIVE
                 else:
-                    color = SEMAPHORE_BLOCKING
+                    color = inverseColor
                 
                 if groupSemaphore.initialValue > 0:
                     # this is the edge with a point in the middle
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color)
+                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
                     
                     # this is this init-thing (edge with point at the end)
-                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(groupSemaphore.initialValue))
-                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
+                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(groupSemaphore.initialValue), color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color)
+                    dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
                 
                 semaphores_buf.remove(groupSemaphore)
                 
@@ -346,24 +349,24 @@ def createSemaphores():
                 if semaphore.initialValue > 0:
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color)
+                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
-                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue))
-                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
+                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue), color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color)
+                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color, fontcolor=inverseColor)
             else:
                 if semaphore.initialValue > 0:
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
+                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
-                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue))
-                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline')
+                    dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue), color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color)
+                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color, fontcolor=inverseColor)
 
 def getNextFrame():
     # try to initialize semaphores
@@ -406,17 +409,23 @@ def reinitializeInitialValuesSemaphores():
         semaphores[semaphore_IDs.index(valorem[0])].initialValue = valorem[1]
 
 # just a helper method
-def createNextImage():
+def createNextImage(color='white', inverseColor='black', display=False):
     getNextFrame()
-    getCurrentImage()
+    getCurrentImage(color, inverseColor, display)
     
-def getCurrentImage():
+def getCurrentImage(color='white', inverseColor='black', display=False):
     global dot
     dot = gv.Digraph(comment='Flowchart')
+    dot.graph_attr.update(bgcolor=color)
     global dummyCounter
     dummyCounter = 0
     
-    createRects()
-    createMutexs()
-    createSemaphores()
-    return dot.pipe(format='svg')
+    createRects(color, inverseColor)
+    createMutexs(color, inverseColor)
+    createSemaphores(color, inverseColor)
+    
+    # only for testing and development
+    if display:
+        dot.view()
+    else:
+        return dot.pipe(format='svg')
