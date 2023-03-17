@@ -9,7 +9,7 @@
         Flowchart Viewer
     </h1></center>
     <center>
-        <div class="pngviewer" id="pngviewer" style="display: none" onchange="this.style.display = block;">
+        <div class="pngviewer" id="pngviewer">
             <img id="img-viewer" src="" style="width: 90vw; height: 84vh"/>
         </div>
     </center>
@@ -99,6 +99,7 @@
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
+                // document.getElementById("img-viewer").style.display = "block";
                 document.getElementById('img-viewer').src = url;
             });
         });
