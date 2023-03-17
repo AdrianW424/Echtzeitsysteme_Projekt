@@ -419,4 +419,4 @@ def getCurrentImage():
     createRects()
     createMutexs()
     createSemaphores()
-    dot.render('rectangle_arrow', view=True, format='svg')
+    return dot.pipe(format='svg')
