@@ -3,6 +3,7 @@ import graphviz as gv
 from io import StringIO
 <<<<<<< HEAD
 
+<<<<<<< HEAD
 # only for tests
 import pickle
 #
@@ -12,6 +13,8 @@ def printt(text):
 =======
 >>>>>>> 4fa62ae0853209bddba3aef5c8f80a1bfb35ce54
 
+=======
+>>>>>>> fe
 class Task:
     def __init__(self, ID, name, activities):
         self.ID = ID
