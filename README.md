@@ -11,6 +11,7 @@ HIGH-Priority:
     * Button zum automatischen Abspielen der Animation (vielleicht mit Auswahl wie viel Zeit zwischen den Bildern sein soll)
 * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
 * Semaphoren currentValue nicht nur auf 0 und 1, sondern auch über 1 hinaus setzen können
+* Fehler von visueller Darstellung lösen
 
 MEDIUM-Priority:
 * Programm verschönern

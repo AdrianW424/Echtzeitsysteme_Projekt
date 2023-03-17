@@ -1,5 +1,6 @@
 import pandas as pd
 import graphviz as gv
+from io import StringIO
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -140,12 +141,11 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
-def openFromCSV(dataFilePath):
+def openFromCSV(content):
+    
+    erasePreviousData()
 
-    data = []
-    linecells = []
-
-    df = pd.read_csv(dataFilePath, sep=',')
+    df = pd.read_csv(StringIO(content), sep=',')
 
     # split seperated values into list elements
     df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
@@ -237,6 +237,17 @@ def openFromCSV(dataFilePath):
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
                 print(semaphore_id)
+                
+def erasePreviousData():
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs
+    activities = []
+    activities_IDs = []
+    tasks = []
+    tasks_IDs = []
+    semaphores = []
+    semaphore_IDs = []
+    mutexs = []
+    mutex_IDs = []
                 
 dummyCounter = 0
 
