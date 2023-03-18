@@ -78,7 +78,10 @@
         margin-right: 20px;
     }
     .btn:hover {
-        background-color: #3c6aae;
+        background-color: #7d7d7d;
+    }
+    .btn:active {
+        background-color: #3eae3c;
     }
     .fa {
         margin-bottom: 5px;
@@ -271,6 +274,12 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     document.getElementById("btn-autoplay").addEventListener("click", async function() {
+        document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay", "Autoplay (Running)");
+        document.getElementById("btn-autoplay").disabled = true;
+        var btns = document.getElementsByClassName("btn");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].disabled = true;
+        }
         for (var i = 0; i < document.getElementById("ap-limit").value; i++) {
             fetch('/next')
             .then(response => response.arrayBuffer())
@@ -279,7 +288,13 @@
                 const url = URL.createObjectURL(blob);
                 document.getElementById('img-viewer').src = url;
             });
-            await sleep(1000);
+            await sleep(document.getElementById("ap-pause").value*1000);
+        }
+        document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay (Running)", "Autoplay");
+        document.getElementById("btn-autoplay").disabled = false;
+        var btns = document.getElementsByClassName("btn");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].disabled = false;
         }
     });
 </script>
