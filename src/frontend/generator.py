@@ -262,16 +262,17 @@ SEMAPHORE_ACTIVE = 'red'
 
 def createRects(color, inverseColor):
     for activity in activities:
-        fillcolor = color
+        fillcolor = 'transparent'
         fontcolor = inverseColor
         if activity.currentValue > 0:
             fillcolor = ACTIVITY_RUNNING
             fontcolor = 'black'
-        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor='transparent')
+        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor=fillcolor)
         
 def createMutexs(color, inverseColor):
+    fillcolor = 'transparent'
     for mutex in mutexs:
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=inverseColor, fillcolor='transparent')
+        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=inverseColor, fillcolor=fillcolor)
         for activity in mutex.activities:
             dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=inverseColor)
         
