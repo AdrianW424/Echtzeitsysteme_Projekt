@@ -251,10 +251,25 @@
             alert(url);
             var link = document.createElement('a');
             link.href = url;
-            link.download = "image.png";
+            link.download = "export.svg";
             link.click();
         } else {
-            // Save GIF
+            fetch('/savegif', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'image/gif'
+            }
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const img = document.createElement('img');
+                var link = document.createElement('a');
+                img.src = url;
+                link.download = "export.gif";
+                link.click();
+            })
+            .catch(error => console.error(error));
         }
     });
 

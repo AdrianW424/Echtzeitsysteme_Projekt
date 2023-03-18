@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from PIL import Image
 import os
 
 app = Flask(__name__)
@@ -42,6 +43,16 @@ def loadCSVFile():
             imageBuffer.append(generator.getCurrentImage())
             return(imageBuffer[0])
     return "Error", 400
+
+@app.route("/savegif", methods=['POST'])
+def saveGif():
+    imageBuffer[0].save("export.gif", format='GIF', append_images=imageBuffer[1:], save_all=True, duration=200, loop=0)
+    with open(imageBuffer[0].save("export.gif", format='GIF', append_images=imageBuffer[1:], save_all=True, duration=200, loop=0), 'rb') as f:
+        gif_bytes = f.read()
+
+    return gif_bytes
+
+
 
 @app.route("/")
 def home():
