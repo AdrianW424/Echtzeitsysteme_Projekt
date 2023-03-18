@@ -6,8 +6,6 @@ app = Flask(__name__)
 
 import generator
 
-imageBuffer = []
-
 @app.route("/next")
 def createNextImage():
     return generator.getImage('white', 'black', step=1)
@@ -28,10 +26,9 @@ def loadCSVFile():
 
 @app.route("/savegif")
 def saveGif():
-    global imageBuffer
     #imageBuffer[0].save("export.gif", format='GIF', append_images=imageBuffer[1:], save_all=True, duration=200, loop=0)
     
-    ########### imageBuffer is deprecated, use generator.getImageArray() instead ###########
+    ########### imageBuffer is deprecated, use generator.getImages('white', 'black', 0, 0) instead ###########
 
     with open("export.gif", 'rb') as f:
         gif_bytes = f.read()
