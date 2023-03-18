@@ -279,6 +279,7 @@
         var btns = document.getElementsByClassName("btn");
         for (var i = 0; i < btns.length; i++) {
             btns[i].disabled = true;
+            btns[i].style.color = "#777";
         }
         for (var i = 0; i < document.getElementById("ap-limit").value; i++) {
             fetch('/next')
@@ -295,6 +296,8 @@
         var btns = document.getElementsByClassName("btn");
         for (var i = 0; i < btns.length; i++) {
             btns[i].disabled = false;
+            if (darkmode == true) btns[i].style.color = "white";
+            else btns[i].style.color = "black";
         }
     });
 </script>
