@@ -246,20 +246,14 @@
     });
 
     document.getElementById("btn-save").addEventListener("click", function() {
-        if (document.getElementById("btn-save").innerHTML.prototype.includes("Image")) {
+        if (gifsave == false) {
             var url = document.getElementById("img-viewer").src;
-            alert(url);
             var link = document.createElement('a');
             link.href = url;
             link.download = "export.svg";
             link.click();
         } else {
-            fetch('/savegif', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'image/gif'
-            }
-            })
+            fetch('/savegif')
             .then(response => response.blob())
             .then(blob => {
                 const url = URL.createObjectURL(blob);
