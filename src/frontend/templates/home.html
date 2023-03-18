@@ -20,10 +20,12 @@
     <hr>
     <h3 style="margin-left: 20px">Autoplay</h3>
     <div class="settings-item"><i id="autoplay-toggle" class="fa fa-toggle-off"></i> Autoplay</div>
-    <div class="settings-item">Pause between frames: 0s</div>
-    <div class="settings-item">Stop after frames: 100</div>
-    <div class="settings-item">Cache frame limit: 25</div>
-    <div class="credit settings-item">© Copyright 2023 <br> Adrian Waldera und Jannik Peplau</div>
+    <div id="ap-settings" style="display: none">
+        <div class="settings-item" id="set-pause">Pause between frames in seconds: <input type="number" id="ap-pause" name="ap-pause" min="0.1" max="10" step="0.1" value="1"></div>
+        <div class="settings-item" id="set-stop">Stop after frames: <input type="number" id="ap-limit" name="ap-limit" min="1" max="100" step="1" value="20"></div>
+        <div class="settings-item" id="set-cache">Cache frame limit: <input type="number" id="ap-cache" name="ap-cache" min="1" max="100" step="1" value="10"></div>
+    </div>
+    <div class="credit settings-item" style="color: rgb(166, 166, 166)">© Copyright 2023 <br> Adrian Waldera und Jannik Peplau</div>
 </div>
 <footer>
     <div class="task-bar" id="task-bar">
@@ -96,7 +98,7 @@
     .settings-window {
         position: fixed;
         top: 0;
-        left: 0;
+        right: 0;
         height: 100vh;
         width: 25vw;
         background-color: #ddd;
@@ -109,6 +111,9 @@
         margin-bottom: 10px;
         margin-left: 20px;
         margin-right: 20px;
+    }
+    .settings-window input {
+        float: right;
     }
     .credit {
         position: absolute;
@@ -200,7 +205,7 @@
         } else {
             document.getElementById("settings-window").style.display = "block";
             document.getElementById("body").style.width = "75vw";
-            document.getElementById("body").style.marginLeft = "25vw";
+            document.getElementById("body").style.marginRight = "25vw";
         }
     });
 
@@ -213,6 +218,7 @@
             document.getElementById("btn-backward").style.display = "none";
             document.getElementById("btn-forward").style.display = "none";
             document.getElementById("btn-autoplay").style.display = "block";
+            document.getElementById("ap-settings").style.display = "block";
         } else {
             autoplay = false;
             document.getElementById("autoplay-toggle").classList.remove("fa-toggle-on");
@@ -220,6 +226,7 @@
             document.getElementById("btn-backward").style.display = "block";
             document.getElementById("btn-forward").style.display = "block";
             document.getElementById("btn-autoplay").style.display = "none";
+            document.getElementById("ap-settings").style.display = "none";
         }
     });
 
@@ -235,6 +242,19 @@
             document.getElementById("gifsave-toggle").classList.remove("fa-toggle-on");
             document.getElementById("gifsave-toggle").classList.add("fa-toggle-off");
             document.getElementById("btn-save").innerHTML = document.getElementById("btn-save").innerHTML.replace("GIF", "Image");
+        }
+    });
+
+    document.getElementById("btn-save").addEventListener("click", function() {
+        if (document.getElementById("btn-save").innerHTML.prototype.includes("Image")) {
+            var url = document.getElementById("img-viewer").src;
+            alert(url);
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = "image.png";
+            link.click();
+        } else {
+            // Save GIF
         }
     });
 </script>
