@@ -5,12 +5,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body id="body">
-    <center><h1>
-        Flowchart Viewer
-    </h1></center>
-
     <center>
-        <div class="pngviewer" id="pngviewer">
+        <div class="pngviewer" id="pngviewer" style="display: none;">
             <img id="img-viewer"/>
         </div>
     </center>
@@ -20,12 +16,14 @@
     <hr>
     <h3 style="margin-left: 20px">General</h3>
     <div class="settings-item"><i id="darkmode-toggle" class="fa fa-toggle-off"></i> Darkmode</div>
+    <div class="settings-item"><i id="gifsave-toggle" class="fa fa-toggle-off"></i> Save Image as GIF</div>
     <hr>
     <h3 style="margin-left: 20px">Autoplay</h3>
     <div class="settings-item"><i id="autoplay-toggle" class="fa fa-toggle-off"></i> Autoplay</div>
     <div class="settings-item">Pause between frames: 0s</div>
     <div class="settings-item">Stop after frames: 100</div>
     <div class="settings-item">Cache frame limit: 25</div>
+    <div class="credit settings-item">© Copyright 2023 <br> Adrian Waldera und Jannik Peplau</div>
 </div>
 <footer>
     <div class="task-bar" id="task-bar">
@@ -112,21 +110,14 @@
         margin-left: 20px;
         margin-right: 20px;
     }
+    .credit {
+        position: absolute;
+        bottom: 85px;
+        left: 0;
+    }
 </style>
 
 <script>
-    function w3_open() {
-        document.getElementById("mySidebar").style.display = "block";
-    }
-
-    function w3_close() {
-        document.getElementById("mySidebar").style.display = "none";
-    }
-
-    document.getElementById("img-viewer").addEventListener('load', function() {
-        document.getElementById("img-viewer").style.display = "block";
-    });
-
     document.getElementById("btn-file").addEventListener('click', function () {
         const input = document.createElement('input');
         input.type = 'file';
@@ -143,6 +134,7 @@
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
                 document.getElementById('img-viewer').src = url;
+                document.getElementById('pngviewer').style.display = 'block';
             });
         });
         input.click();
@@ -201,14 +193,14 @@
     });
 
     document.getElementById("btn-settings").addEventListener('click', function() {
-        if (document.getElementById("settings-window").style.display == "none") {
-            document.getElementById("settings-window").style.display = "block";
-            document.getElementById("body").style.width = "75vw";
-            document.getElementById("body").style.marginLeft = "25vw";
-        } else {
+        if (document.getElementById("settings-window").style.display == "block") {
             document.getElementById("settings-window").style.display = "none";
             document.getElementById("body").style.width = "100vw";
             document.getElementById("body").style.marginLeft = "0vw";
+        } else {
+            document.getElementById("settings-window").style.display = "block";
+            document.getElementById("body").style.width = "75vw";
+            document.getElementById("body").style.marginLeft = "25vw";
         }
     });
 
@@ -228,6 +220,21 @@
             document.getElementById("btn-backward").style.display = "block";
             document.getElementById("btn-forward").style.display = "block";
             document.getElementById("btn-autoplay").style.display = "none";
+        }
+    });
+
+    var gifsave = false
+    document.getElementById("gifsave-toggle").addEventListener('click', function() {
+        if (gifsave == false) {
+            gifsave = true;
+            document.getElementById("gifsave-toggle").classList.remove("fa-toggle-off");
+            document.getElementById("gifsave-toggle").classList.add("fa-toggle-on");
+            document.getElementById("btn-save").innerHTML = document.getElementById("btn-save").innerHTML.replace("Image", "GIF");
+        } else {
+            gifsave = false;
+            document.getElementById("gifsave-toggle").classList.remove("fa-toggle-on");
+            document.getElementById("gifsave-toggle").classList.add("fa-toggle-off");
+            document.getElementById("btn-save").innerHTML = document.getElementById("btn-save").innerHTML.replace("GIF", "Image");
         }
     });
 </script>
