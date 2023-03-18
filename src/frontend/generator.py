@@ -450,6 +450,7 @@ def getAllStartPoints():
 def initGlobals(color='transparent'):
     global dot
     dot = gv.Digraph(comment='Flowchart')
+    dot.attr(size='10,10')
     dot.graph_attr.update(bgcolor=color)
     global dummyCounter
     dummyCounter = 0

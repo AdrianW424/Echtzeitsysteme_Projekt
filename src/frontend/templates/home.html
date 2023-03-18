@@ -306,8 +306,9 @@
                 const url = URL.createObjectURL(blob);
                 document.getElementById('pngviewer').src = url;
             });
-            console.log(document.getElementById("autoplay-pause").value);
-            await sleep(document.getElementById("autoplay-pause").value*1000);
+            if (i < document.getElementById("autoplay-limit").value-1) {
+                await sleep(document.getElementById("autoplay-pause").value*1000);
+            }
         }
         document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay (Running)", "Autoplay");
         document.getElementById("btn-autoplay").disabled = false;
