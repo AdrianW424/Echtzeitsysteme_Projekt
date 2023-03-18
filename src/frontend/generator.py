@@ -262,6 +262,7 @@ def erasePreviousData():
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
 ACTIVITY_RUNNING = 'green'
+MUTEX_PICKED = 'lightblue'
 SEMAPHORE_ACTIVE = 'red'
 
 def createRects(color, inverseColor):
@@ -274,11 +275,15 @@ def createRects(color, inverseColor):
         dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor=fillcolor)
         
 def createMutexs(color, inverseColor):
-    fillcolor = 'transparent'
     for mutex in mutexs:
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=inverseColor, fillcolor=fillcolor)
+        fillcolor = 'transparent'
+        fontColor = inverseColor
+        if mutex.pickedBy != None:
+            fillcolor = MUTEX_PICKED
+            fontColor = 'black'
+        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=fontColor, fillcolor=fillcolor)
         for activity in mutex.activities:
-            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=inverseColor)
+            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=(lambda x: MUTEX_PICKED if x != None else inverseColor)(mutex.pickedBy))
         
 def createSemaphores(color, inverseColor):
     global dummyCounter
@@ -397,11 +402,6 @@ def getAllStartPoints():
             startPoints.append(semaphore)
             
     return startPoints
-
-# just a helper method
-# def createNextImage(color='white', inverseColor='black', display=False):
-#     getNextFrame()
-#     return getCurrentImage(color, inverseColor, display)
     
 def initGlobals():
     global dot
@@ -409,21 +409,6 @@ def initGlobals():
     dot.graph_attr.update(bgcolor='transparent')
     global dummyCounter
     dummyCounter = 0
-    
-# def getCurrentImage(color='white', inverseColor='black', display=False):
-#     global dot
-#     global dummyCounter
-    
-#     initGlobals()
-    
-#     createRects(color, inverseColor)
-#     createMutexs(color, inverseColor)
-#     createSemaphores(color, inverseColor)
-    
-#     # only for testing and development
-#     if display:
-#         dot.view()
-#     return dot.pipe(format='svg')
 
 def getImage(color='white', inverseColor='black', step=0, display=False):
     # macro method to generate an image, no matter if backward, forward or current
@@ -459,6 +444,9 @@ def getImage(color='white', inverseColor='black', step=0, display=False):
     cursor = (lambda x: 0 if x < 0 else x)(cursor+step)
     
     if dot != None:
+        # do color stuff here
+        # update color of every node of dot
+            
         if display:
             dot.view()
         return dot.pipe(format='svg')
