@@ -17,7 +17,15 @@
 </body>
 <div class="settings-window" id="settings-window">
     <center><h2>Settings</h2></center>
-    <i id="darkmode-toggle" class="fa fa-toggle-off"></i>Darkmode
+    <hr>
+    <h3 style="margin-left: 20px">General</h3>
+    <div class="settings-item"><i id="darkmode-toggle" class="fa fa-toggle-off"></i> Darkmode</div>
+    <hr>
+    <h3 style="margin-left: 20px">Autoplay</h3>
+    <div class="settings-item"><i id="autoplay-toggle" class="fa fa-toggle-off"></i> Autoplay</div>
+    <div class="settings-item">Pause between frames: 0s</div>
+    <div class="settings-item">Stop after frames: 100</div>
+    <div class="settings-item">Cache frame limit: 25</div>
 </div>
 <footer>
     <div class="task-bar" id="task-bar">
@@ -25,6 +33,7 @@
             <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i><br>Load CSV</button>
             <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i><br>Backward</i></button>
             <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i><br>Forward</button>
+            <button class="btn btn-autoplay" id="btn-autoplay" style="display: none"><i class="fa fa-play"></i><br>Autoplay</button>
             <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i><br>Save Image</button>
             <button class="btn btn-settings" id="btn-settings"><i class="fa fa-cog"></i><br>Settings</button>
         </div>
@@ -86,8 +95,6 @@
         height: 100%;
     }
     
-
-    /* Put settings window in middle of screen, overlaying everything else */
     .settings-window {
         position: fixed;
         top: 0;
@@ -98,6 +105,12 @@
         border: 1px solid black;
         border-radius: 5px;
         display: none;
+    }
+    .settings-item {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 20px;
+        margin-right: 20px;
     }
 </style>
 
@@ -158,6 +171,7 @@
     var darkmode = false;
     document.getElementById("darkmode-toggle").addEventListener('click', function() {
         if (darkmode == true) {
+            darkmode = false;
             document.getElementById("darkmode-toggle").classList.remove("fa-toggle-on");
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-off");
             document.getElementById("html").style.backgroundColor = "#eee";
@@ -169,8 +183,8 @@
                 btns[i].style.backgroundColor = '#ddd';
                 btns[i].style.color = 'black';
             }
-            darkmode = false;
         } else {
+            darkmode = true;
             document.getElementById("darkmode-toggle").classList.remove("fa-toggle-off");
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-on");
             document.getElementById("html").style.backgroundColor = "#111";
@@ -183,7 +197,6 @@
                 btns[i].style.color = 'white';
             }
             
-            darkmode = true;
         }
     });
 
@@ -196,6 +209,25 @@
             document.getElementById("settings-window").style.display = "none";
             document.getElementById("body").style.width = "100vw";
             document.getElementById("body").style.marginLeft = "0vw";
+        }
+    });
+
+    var autoplay = false
+    document.getElementById("autoplay-toggle").addEventListener('click', function() {
+        if (autoplay == false) {
+            autoplay = true;
+            document.getElementById("autoplay-toggle").classList.remove("fa-toggle-off");
+            document.getElementById("autoplay-toggle").classList.add("fa-toggle-on");
+            document.getElementById("btn-backward").style.display = "none";
+            document.getElementById("btn-forward").style.display = "none";
+            document.getElementById("btn-autoplay").style.display = "block";
+        } else {
+            autoplay = false;
+            document.getElementById("autoplay-toggle").classList.remove("fa-toggle-on");
+            document.getElementById("autoplay-toggle").classList.add("fa-toggle-off");
+            document.getElementById("btn-backward").style.display = "block";
+            document.getElementById("btn-forward").style.display = "block";
+            document.getElementById("btn-autoplay").style.display = "none";
         }
     });
 </script>
