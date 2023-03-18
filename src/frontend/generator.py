@@ -292,8 +292,6 @@ def createSemaphores(color, inverseColor):
         # if semaphore has groupWith, connect those semaphores together. Those will then be erased from the list
         if len(semaphore.groupWith) != 0:
             
-            # TODO: add initial Value to the semaphore
-            
             # draw semaphores
             middleDummyName = "Dummy" + str(dummyCounter)
             dot.node(middleDummyName, shape='point', width="0.01", height="0.01", color=color)
@@ -416,7 +414,7 @@ def createNextImage(color='white', inverseColor='black', display=False):
 def getCurrentImage(color='white', inverseColor='black', display=False):
     global dot
     dot = gv.Digraph(comment='Flowchart')
-    dot.graph_attr.update(bgcolor=color)
+    dot.graph_attr.update(bgcolor='transparent')
     global dummyCounter
     dummyCounter = 0
     
