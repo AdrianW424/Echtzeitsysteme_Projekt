@@ -257,4 +257,20 @@
             // Save GIF
         }
     });
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    document.getElementById("btn-autoplay").addEventListener("click", async function() {
+        for (var i = 0; i < document.getElementById("ap-limit").value; i++) {
+            fetch('/next')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const blob = new Blob([data], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                document.getElementById('img-viewer').src = url;
+            });
+            sleep(1000)
+        }
+    });
 </script>
