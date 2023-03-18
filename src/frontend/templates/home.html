@@ -198,6 +198,20 @@
             }
             
         }
+        fetch('/darkmode_toggle', {
+            method: 'POST',
+            body: JSON.stringify({'darkmode': darkmode}),
+            cache: "no-cache",
+            headers: new Headers({
+            "content-type": "application/json"
+            })
+        })
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            const blob = new Blob([data], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            document.getElementById('pngviewer').src = url;
+        });
     });
 
     document.getElementById("btn-settings").addEventListener('click', function() {
