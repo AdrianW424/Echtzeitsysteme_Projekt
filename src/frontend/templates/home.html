@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html id="html">
 <head>
-    <title>Home</title>
+    <title>Flowchart Viewer</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body id="body">
     <center>
-        <div class="pngviewer" id="pngviewer" style="display: none;">
-            <img id="img-viewer"/>
+        <div class="pngviewer-div" id="pngviewer-div" style="display: none;">
+            <img id="pngviewer"/>
         </div>
     </center>
 </body>
@@ -20,10 +20,10 @@
     <hr>
     <h3 style="margin-left: 20px">Autoplay</h3>
     <div class="settings-item"><i id="autoplay-toggle" class="fa fa-toggle-off"></i> Autoplay</div>
-    <div id="ap-settings" style="display: none">
-        <div class="settings-item" id="set-pause">Pause between frames in seconds: <input type="number" id="ap-pause" name="ap-pause" min="0.1" max="10" step="0.1" value="1"></div>
-        <div class="settings-item" id="set-stop">Stop after frames: <input type="number" id="ap-limit" name="ap-limit" min="1" max="999" step="1" value="20"></div>
-        <div class="settings-item" id="set-abort"><a style="color: red; cursor: pointer"><u>Abort autoplay</u></a></div>
+    <div id="autoplay-settings" style="display: none">
+        <div class="settings-item" id="autoplay-pause">Pause between frames in seconds: <input type="number" id="autoplay-pause" name="autoplay-pause" min="0.1" max="10" step="0.1" value="1"></div>
+        <div class="settings-item" id="autoplay-stop">Stop after frames: <input type="number" id="autoplay-limit" name="autoplay-limit" min="1" max="999" step="1" value="20"></div>
+        <div class="settings-item" id="autoplay-abort"><a style="color: red; cursor: pointer"><u>Abort autoplay</u></a></div>
     </div>
     <div class="credit settings-item" style="color: rgb(166, 166, 166)">© Copyright 2023 <br> Adrian Waldera und Jannik Peplau</div>
 </div>
@@ -87,14 +87,14 @@
         margin-bottom: 5px;
     }
 
-    .pngviewer {
+    .pngviewer-div {
         width: 95%;
         height: 80%;
         border: 1px solid black;
         border-radius: 5px;
         margin-bottom: 120px;
     }
-    .pngviewer img{
+    .pngviewer-div img{
         height: 100%;
     }
     
@@ -141,8 +141,8 @@
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
-                document.getElementById('img-viewer').src = url;
-                document.getElementById('pngviewer').style.display = 'block';
+                document.getElementById('pngviewer').src = url;
+                document.getElementById('pngviewer-div').style.display = 'block';
             });
         });
         input.click();
@@ -154,7 +154,7 @@
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
-                document.getElementById('img-viewer').src = url;
+                document.getElementById('pngviewer').src = url;
             });
     });
 
@@ -164,7 +164,7 @@
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
-                document.getElementById('img-viewer').src = url;
+                document.getElementById('pngviewer').src = url;
             });
     });
 
@@ -221,7 +221,7 @@
             document.getElementById("btn-backward").style.display = "none";
             document.getElementById("btn-forward").style.display = "none";
             document.getElementById("btn-autoplay").style.display = "block";
-            document.getElementById("ap-settings").style.display = "block";
+            document.getElementById("autoplay-settings").style.display = "block";
         } else {
             autoplay = false;
             document.getElementById("autoplay-toggle").classList.remove("fa-toggle-on");
@@ -229,7 +229,7 @@
             document.getElementById("btn-backward").style.display = "block";
             document.getElementById("btn-forward").style.display = "block";
             document.getElementById("btn-autoplay").style.display = "none";
-            document.getElementById("ap-settings").style.display = "none";
+            document.getElementById("autoplay-settings").style.display = "none";
         }
     });
 
@@ -250,7 +250,7 @@
 
     document.getElementById("btn-save").addEventListener("click", function() {
         if (gifsave == false) {
-            var url = document.getElementById("img-viewer").src;
+            var url = document.getElementById("pngviewer").src;
             var link = document.createElement('a');
             link.href = url;
             link.download = "export.svg";
@@ -281,15 +281,15 @@
             btns[i].disabled = true;
             btns[i].style.color = "#777";
         }
-        for (var i = 0; i < document.getElementById("ap-limit").value; i++) {
+        for (var i = 0; i < document.getElementById("autoplay-limit").value; i++) {
             fetch('/next')
             .then(response => response.arrayBuffer())
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
-                document.getElementById('img-viewer').src = url;
+                document.getElementById('pngviewer').src = url;
             });
-            await sleep(document.getElementById("ap-pause").value*1000);
+            await sleep(document.getElementById("autoplay-pause").value*1000);
         }
         document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay (Running)", "Autoplay");
         document.getElementById("btn-autoplay").disabled = false;
