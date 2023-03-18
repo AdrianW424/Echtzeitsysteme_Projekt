@@ -11,6 +11,8 @@ HIGH-Priority:
     * Button zum automatischen Abspielen der Animation (vielleicht mit Auswahl wie viel Zeit zwischen den Bildern sein soll)
     * vielleicht kleines Fenster mit CSV-Inhalt. Sowas wie Editor, in dem man live code ändern kann
 * Backend:
+    * Backward und Forward Buttons im Backend implementieren. Funktion, die vor und zurück gehen kann und immer die Position im Array zurückliefert. Vielleicht
+     mit Bildgenerierung verbinden. Neue Funktion, die entsprechend einer gegebenen Laufrichtung ein neues Bild zurückliefert
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * Farbgebung der Mutexs und gestrichelten Linien ändern, sobald gepickt
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten

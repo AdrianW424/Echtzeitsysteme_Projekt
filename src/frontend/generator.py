@@ -141,6 +141,9 @@ semaphores = []
 mutex_IDs = []
 mutexs = []
 
+historyOfDigraphs = []
+cursor = 0
+
 def openFromCSV(content=None, Path=None):
     # content for real use, Path for testing and development
     
@@ -243,7 +246,7 @@ def openFromCSV(content=None, Path=None):
                 print(semaphore_id)
                 
 def erasePreviousData():
-    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, cursor, historyOfDigraphs
     activities = []
     activities_IDs = []
     tasks = []
@@ -252,8 +255,9 @@ def erasePreviousData():
     semaphore_IDs = []
     mutexs = []
     mutex_IDs = []
-                
-dummyCounter = 0
+    dot = None
+    cursor = 0
+    historyOfDigraphs = []
 
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
@@ -385,8 +389,6 @@ def getNextFrame():
     for activity in activitiesSorted[:-1]:
         activity.checkActivity(False)
 
-historySemaphores = []
-
 def getAllStartPoints():
     # get all activities that have no predecessor
     startPoints = []
@@ -396,36 +398,67 @@ def getAllStartPoints():
             
     return startPoints
 
-def saveInitialValuesSemaphores():
-    # save the initial values of all semaphores
-    for semaphore in semaphores:
-        if semaphore.initialValue > 0:
-            historySemaphores.append([semaphore.ID, semaphore.initialValue])
-
-def reinitializeInitialValuesSemaphores():
-    # set all semaphores back to their initial values
-    for valorem in historySemaphores:
-        semaphores[semaphore_IDs.index(valorem[0])].initialValue = valorem[1]
-
 # just a helper method
-def createNextImage(color='white', inverseColor='black', display=False):
-    getNextFrame()
-    return getCurrentImage(color, inverseColor, display)
+# def createNextImage(color='white', inverseColor='black', display=False):
+#     getNextFrame()
+#     return getCurrentImage(color, inverseColor, display)
     
-def getCurrentImage(color='white', inverseColor='black', display=False):
+def initGlobals():
     global dot
     dot = gv.Digraph(comment='Flowchart')
     dot.graph_attr.update(bgcolor='transparent')
     global dummyCounter
     dummyCounter = 0
     
-    createRects(color, inverseColor)
-    createMutexs(color, inverseColor)
-    createSemaphores(color, inverseColor)
+# def getCurrentImage(color='white', inverseColor='black', display=False):
+#     global dot
+#     global dummyCounter
     
-    # only for testing and development
-    if display:
-        dot.view()
-        return dot.pipe(format='svg')
-    else:
+#     initGlobals()
+    
+#     createRects(color, inverseColor)
+#     createMutexs(color, inverseColor)
+#     createSemaphores(color, inverseColor)
+    
+#     # only for testing and development
+#     if display:
+#         dot.view()
+#     return dot.pipe(format='svg')
+
+def getImage(color='white', inverseColor='black', step=0, display=False):
+    # macro method to generate an image, no matter if backward, forward or current
+    global historyOfDigraphs
+    global cursor
+    global dot
+    global dummyCounter
+    
+    #check if first image is requested
+    if dot == None:
+        initGlobals()
+        
+        createRects(color, inverseColor)
+        createMutexs(color, inverseColor)
+        createSemaphores(color, inverseColor)
+        historyOfDigraphs.append(dot)
+        
+    if cursor+step <= len(historyOfDigraphs)-1 and cursor+step >= 0:
+        dot = historyOfDigraphs[cursor+step]
+    elif cursor+step < 0:
+        dot = historyOfDigraphs[0]
+    elif cursor+step > len(historyOfDigraphs)-1:
+        for _ in range(cursor+step - (len(historyOfDigraphs)-1)):
+            getNextFrame()
+            
+            initGlobals()
+    
+            createRects(color, inverseColor)
+            createMutexs(color, inverseColor)
+            createSemaphores(color, inverseColor)
+            historyOfDigraphs.append(dot)
+    
+    cursor = (lambda x: 0 if x < 0 else x)(cursor+step)
+    
+    if dot != None:
+        if display:
+            dot.view()
         return dot.pipe(format='svg')
