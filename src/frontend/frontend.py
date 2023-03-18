@@ -8,11 +8,11 @@ import generator
 
 @app.route("/next")
 def createNextImage():
-    return generator.getImage('white', 'black', step=1)
+    return generator.getSingleImage('white', 'black', step=1)
    
 @app.route("/prev")
 def getPrevImage():
-    return generator.getImage('white', 'black', step=-1)
+    return generator.getSingleImage('white', 'black', step=-1)
 
 @app.route("/process_file", methods=['POST'])
 def loadCSVFile():
@@ -21,7 +21,7 @@ def loadCSVFile():
         if file:
             content = file.read().decode('utf-8')
             generator.openFromCSV(content)
-            return generator.getImage('white', 'black', step=0)
+            return generator.getSingleImage('white', 'black', step=0)
     return "Error", 400
 
 @app.route("/savegif")
@@ -30,10 +30,7 @@ def saveGif():
     
     ########### imageBuffer is deprecated, use generator.getImages('white', 'black', 0, 0) instead ###########
 
-    with open("export.gif", 'rb') as f:
-        gif_bytes = f.read()
-
-    return gif_bytes
+    return generator.createGIF('white', 'black', 0, 0)
 
 
 

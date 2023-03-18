@@ -305,7 +305,10 @@ SEMAPHORE_ACTIVE = 'red'
 
 def createRects(color, inverseColor, storedObjects):
     for activity in storedObjects.activities:
-        fillcolor = 'transparent'
+        if color[0] == 'r':
+            fillcolor = color[1:]
+        else:
+            fillcolor = 'transparent'
         fontcolor = inverseColor
         if activity.currentValue > 0:
             fillcolor = ACTIVITY_RUNNING
@@ -314,7 +317,10 @@ def createRects(color, inverseColor, storedObjects):
         
 def createMutexs(color, inverseColor, storedObjects):
     for mutex in storedObjects.mutexs:
-        fillcolor = 'transparent'
+        if color[0] == 'r':
+            fillcolor = color[1:]
+        else:
+            fillcolor = 'transparent'
         fontColor = inverseColor
         if mutex.pickedBy != None:
             fillcolor = MUTEX_PICKED
@@ -441,10 +447,10 @@ def getAllStartPoints():
             
     return startPoints
     
-def initGlobals():
+def initGlobals(color='transparent'):
     global dot
     dot = gv.Digraph(comment='Flowchart')
-    dot.graph_attr.update(bgcolor='transparent')
+    dot.graph_attr.update(bgcolor=color)
     global dummyCounter
     dummyCounter = 0
 
@@ -474,8 +480,23 @@ def getSingleImage(color='white', inverseColor='black', step=0, display=False):
         if display:
             dot.view()
         return dot.pipe(format='svg')
-    
-def getImages(color='white', inverseColor='black', startIndex = 0, amount = 0):
+
+
+
+from PIL import Image
+import glob
+
+# Create the frames
+frames = []
+imgs = glob.glob("*.png")
+for i in imgs:
+    new_frame = Image.open(i)
+    frames.append(new_frame)
+
+from PIL import Image
+import io
+
+def createGIF(color='white', inverseColor='black', startIndex = 0, amount = 0, duration = 100, loop = 0):
     # 0 means all already generated images
     listOfImages = []
     startObject, overflow = storedObjects.getStorageObjectByIndex(startIndex)
@@ -484,14 +505,17 @@ def getImages(color='white', inverseColor='black', startIndex = 0, amount = 0):
             amount = -1
         
         while amount != 0 and startObject != None:
-            initGlobals()
+            initGlobals(color=color)
 
-            createRects(color, inverseColor, startObject)
-            createMutexs(color, inverseColor, startObject)
-            createSemaphores(color, inverseColor, startObject)
+            createRects('r'+color, inverseColor, startObject)
+            createMutexs('r'+color, inverseColor, startObject)
+            createSemaphores('r'+color, inverseColor, startObject)
             
-            listOfImages.append(dot.pipe(format='svg'))
+            listOfImages.append(Image.open(io.BytesIO(dot.pipe(format='png'))))
             startObject = startObject.nextStorageObject
             amount -= 1
-        
-    return listOfImages
+
+    gif_buffer = io.BytesIO()
+    listOfImages[0].save(gif_buffer, format='GIF', append_images=listOfImages[1:], save_all=True, duration=duration, loop=loop)
+    
+    return gif_buffer.getvalue()    

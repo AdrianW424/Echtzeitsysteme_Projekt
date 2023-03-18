@@ -260,11 +260,14 @@
             .then(response => response.blob())
             .then(blob => {
                 const url = URL.createObjectURL(blob);
-                const img = document.createElement('img');
-                var link = document.createElement('a');
-                img.src = url;
+                const link = document.createElement('a');
                 link.download = "export.gif";
+                link.href = url;
+                link.style.display = "none";
+                document.body.appendChild(link);
                 link.click();
+                URL.revokeObjectURL(url);
+                document.body.removeChild(link);
             })
             .catch(error => console.error(error));
         }
