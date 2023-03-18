@@ -17,9 +17,9 @@
 </body>
 <div class="settings-window" id="settings-window">
     <center><h2>Settings</h2></center>
-    <button class="" id="btn-darkmode"><i id="toggle" class="fa fa-toggle-off"></i>Darkmode</button>
+    <i id="darkmode-toggle" class="fa fa-toggle-off"></i>Darkmode
 </div>
-<foloter>
+<footer>
     <div class="task-bar" id="task-bar">
         <div class="task-bar-container">
             <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i><br>Load CSV</button>
@@ -94,7 +94,7 @@
         left: 0;
         height: 100vh;
         width: 25vw;
-        background-color: #fff;
+        background-color: #ddd;
         border: 1px solid black;
         border-radius: 5px;
         display: none;
@@ -156,29 +156,31 @@
     });
 
     var darkmode = false;
-    document.getElementById("btn-darkmode").addEventListener('click', function() {
+    document.getElementById("darkmode-toggle").addEventListener('click', function() {
         if (darkmode == true) {
-            document.getElementById("toggle").classList.remove("fa-toggle-on");
-            document.getElementById("toggle").classList.add("fa-toggle-off");
+            document.getElementById("darkmode-toggle").classList.remove("fa-toggle-on");
+            document.getElementById("darkmode-toggle").classList.add("fa-toggle-off");
             document.getElementById("html").style.backgroundColor = "#eee";
             document.getElementById("html").style.color = "black";
+            document.getElementById("settings-window").style.backgroundColor = "#ddd";
             document.getElementById("task-bar").style.backgroundColor = "#ccc";
-            document.getElementById("task-bar").color = "black";
             var btns = document.getElementsByClassName("btn");
             for (var i = 0; i < btns.length; i++) {
                 btns[i].style.backgroundColor = '#ddd';
+                btns[i].style.color = 'black';
             }
             darkmode = false;
         } else {
-            document.getElementById("toggle").classList.remove("fa-toggle-off");
-            document.getElementById("toggle").classList.add("fa-toggle-on");
+            document.getElementById("darkmode-toggle").classList.remove("fa-toggle-off");
+            document.getElementById("darkmode-toggle").classList.add("fa-toggle-on");
             document.getElementById("html").style.backgroundColor = "#111";
             document.getElementById("html").style.color = "white";
+            document.getElementById("settings-window").style.backgroundColor = "#222";
             document.getElementById("task-bar").style.backgroundColor = "#333";
-            document.getElementById("task-bar").color = "white";
             var btns = document.getElementsByClassName("btn");
             for (var i = 0; i < btns.length; i++) {
                 btns[i].style.backgroundColor = '#222'; 
+                btns[i].style.color = 'white';
             }
             
             darkmode = true;
