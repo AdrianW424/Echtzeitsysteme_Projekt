@@ -1,6 +1,4 @@
 from flask import Flask, render_template, request, jsonify
-from PIL import Image
-from io import BytesIO
 
 app = Flask(__name__)
 
@@ -26,10 +24,6 @@ def loadCSVFile():
 
 @app.route("/savegif")
 def saveGif():
-    #imageBuffer[0].save("export.gif", format='GIF', append_images=imageBuffer[1:], save_all=True, duration=200, loop=0)
-    
-    ########### imageBuffer is deprecated, use generator.getImages('white', 'black', 0, 0) instead ###########
-
     return generator.createGIF('white', 'black', 0, 0)
 
 
