@@ -267,11 +267,11 @@ def createRects(color, inverseColor):
         if activity.currentValue > 0:
             fillcolor = ACTIVITY_RUNNING
             fontcolor = 'black'
-        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor=fillcolor)
+        dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor='transparent')
         
 def createMutexs(color, inverseColor):
     for mutex in mutexs:
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=inverseColor, fillcolor=color)
+        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=inverseColor, fillcolor='transparent')
         for activity in mutex.activities:
             dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=inverseColor)
         
@@ -409,7 +409,7 @@ def reinitializeInitialValuesSemaphores():
 # just a helper method
 def createNextImage(color='white', inverseColor='black', display=False):
     getNextFrame()
-    getCurrentImage(color, inverseColor, display)
+    return getCurrentImage(color, inverseColor, display)
     
 def getCurrentImage(color='white', inverseColor='black', display=False):
     global dot
@@ -425,5 +425,6 @@ def getCurrentImage(color='white', inverseColor='black', display=False):
     # only for testing and development
     if display:
         dot.view()
+        return dot.pipe(format='svg')
     else:
         return dot.pipe(format='svg')
