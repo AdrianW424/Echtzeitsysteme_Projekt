@@ -132,6 +132,8 @@ class Semaphore:
         self.currentValue = 0
         
 class StorageObject:
+    length = 0
+    
     def __init__(self, tasks, activities, semaphores, mutexs, previousStorageObject=None, nextStorageObject=None):
         self.tasks = copy.deepcopy(tasks)
         self.activities = copy.deepcopy(activities)
@@ -139,6 +141,10 @@ class StorageObject:
         self.mutexs = copy.deepcopy(mutexs)
         self.previousStorageObject = previousStorageObject
         self.nextStorageObject = nextStorageObject
+        
+        self.index = (lambda x: 0 if x == None else x.index + 1)(previousStorageObject)
+        
+        self.length = self.index + 1
     
     def getStorageObject(self, step=0):
         while step > 0 and self.nextStorageObject != None:
@@ -153,6 +159,15 @@ class StorageObject:
             step = 0
             
         return self, step
+    
+    def getStorageObjectByIndex(self, index):
+        while index > self.index and self.nextStorageObject != None:
+            self = self.nextStorageObject
+        
+        while index < self.index and self.previousStorageObject != None:
+            self = self.previousStorageObject
+            
+        return self, index - self.index
 
 tasks_IDs = []
 tasks = []
@@ -167,9 +182,6 @@ mutex_IDs = []
 mutexs = []
 
 storedObjects = None
-
-historyOfDigraphs = []
-cursor = 0
 
 def openFromCSV(content=None, Path=None):
     # content for real use, Path for testing and development
@@ -273,7 +285,7 @@ def openFromCSV(content=None, Path=None):
                 print(semaphore_id)
                 
 def erasePreviousData():
-    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, storedObjects, cursor, historyOfDigraphs
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, storedObjects
     activities = []
     activities_IDs = []
     tasks = []
@@ -284,8 +296,6 @@ def erasePreviousData():
     mutex_IDs = []
     dot = None
     storedObjects = None
-    cursor = 0
-    historyOfDigraphs = []
 
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
@@ -461,9 +471,27 @@ def getSingleImage(color='white', inverseColor='black', step=0, display=False):
     createSemaphores(color, inverseColor, storedObjects)
     
     if dot != None:
-        # do color stuff here
-        # update color of every node of dot
-            
         if display:
             dot.view()
         return dot.pipe(format='svg')
+    
+def getImages(color='white', inverseColor='black', startIndex = 0, amount = 0):
+    # 0 means all already generated images
+    listOfImages = []
+    startObject, overflow = storedObjects.getStorageObjectByIndex(startIndex)
+    if overflow == 0:
+        if amount == 0:
+            amount = -1
+        
+        while amount != 0 and startObject != None:
+            initGlobals()
+
+            createRects(color, inverseColor, startObject)
+            createMutexs(color, inverseColor, startObject)
+            createSemaphores(color, inverseColor, startObject)
+            
+            listOfImages.append(dot.pipe(format='svg'))
+            startObject = startObject.nextStorageObject
+            amount -= 1
+        
+    return listOfImages
