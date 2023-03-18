@@ -2,6 +2,8 @@ import pandas as pd
 import graphviz as gv
 from io import StringIO
 
+import copy
+
 class Task:
     def __init__(self, ID, name, activities):
         self.ID = ID
@@ -17,7 +19,7 @@ class Activity:
         self.semaphoresIN = semaphoresIN
         self.semaphoresOUT = semaphoresOUT
         self.mutexes = mutexes
-        self.pickedMutexes = []
+        self.pickedMutexs = []
         self.currentValue = 0
         self.currentDuration = duration
         
@@ -90,7 +92,7 @@ class Activity:
                 return False
         
         for mutex in self.mutexes:
-            if mutex not in self.pickedMutexes:
+            if mutex not in self.pickedMutexs:
                 self.pickMutex(mutex)
         # return true if all mutexes could be picked
         return True
@@ -100,12 +102,12 @@ class Activity:
                 semaphoreIN.currentValue = 0
     
     def releaseMutexes(self):
-        for mutex in self.pickedMutexes:
+        for mutex in self.pickedMutexs:
             mutex.pickedBy = None
-        self.pickedMutexes = []
+        self.pickedMutexs = []
             
     def pickMutex(self, mutex):
-        self.pickedMutexes.append(mutex)
+        self.pickedMutexs.append(mutex)
         mutex.pickedBy = self
     
     def activateOutgoingSemaphores(self):
@@ -128,6 +130,29 @@ class Semaphore:
         self.activityIN = activityIN
         self.activityOUT = activityOUT
         self.currentValue = 0
+        
+class StorageObject:
+    def __init__(self, tasks, activities, semaphores, mutexs, previousStorageObject=None, nextStorageObject=None):
+        self.tasks = copy.deepcopy(tasks)
+        self.activities = copy.deepcopy(activities)
+        self.semaphores = copy.deepcopy(semaphores)
+        self.mutexs = copy.deepcopy(mutexs)
+        self.previousStorageObject = previousStorageObject
+        self.nextStorageObject = nextStorageObject
+    
+    def getStorageObject(self, step=0):
+        while step > 0 and self.nextStorageObject != None:
+            self = self.nextStorageObject
+            step -= 1
+        
+        while step < 0 and self.previousStorageObject != None:
+            self = self.previousStorageObject
+            step += 1
+            
+        if step < 0:
+            step = 0
+            
+        return self, step
 
 tasks_IDs = []
 tasks = []
@@ -140,6 +165,8 @@ semaphores = []
 
 mutex_IDs = []
 mutexs = []
+
+storedObjects = None
 
 historyOfDigraphs = []
 cursor = 0
@@ -246,7 +273,7 @@ def openFromCSV(content=None, Path=None):
                 print(semaphore_id)
                 
 def erasePreviousData():
-    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, cursor, historyOfDigraphs
+    global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, storedObjects, cursor, historyOfDigraphs
     activities = []
     activities_IDs = []
     tasks = []
@@ -256,17 +283,18 @@ def erasePreviousData():
     mutexs = []
     mutex_IDs = []
     dot = None
+    storedObjects = None
     cursor = 0
     historyOfDigraphs = []
 
 # mmaybe pass ID of activity, semaphore that you want to color for the animation
 
 ACTIVITY_RUNNING = 'green'
-MUTEX_PICKED = 'lightblue'
+MUTEX_PICKED = 'orange'
 SEMAPHORE_ACTIVE = 'red'
 
-def createRects(color, inverseColor):
-    for activity in activities:
+def createRects(color, inverseColor, storedObjects):
+    for activity in storedObjects.activities:
         fillcolor = 'transparent'
         fontcolor = inverseColor
         if activity.currentValue > 0:
@@ -274,23 +302,23 @@ def createRects(color, inverseColor):
             fontcolor = 'black'
         dot.node("Activity"+str(activity.ID), shape='record', style='rounded,filled', label='{'+activity.parentTask.name+'|'+activity.name+'}', color=inverseColor, fontcolor=fontcolor, fillcolor=fillcolor)
         
-def createMutexs(color, inverseColor):
-    for mutex in mutexs:
+def createMutexs(color, inverseColor, storedObjects):
+    for mutex in storedObjects.mutexs:
         fillcolor = 'transparent'
         fontColor = inverseColor
         if mutex.pickedBy != None:
             fillcolor = MUTEX_PICKED
             fontColor = 'black'
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', sides='5', label=mutex.name, color=inverseColor, fontcolor=fontColor, fillcolor=fillcolor)
+        dot.node("Mutex"+str(mutex.ID), shape='polygon', style='filled', sides='5', label=mutex.name, color=inverseColor, fontcolor=fontColor, fillcolor=fillcolor)
         for activity in mutex.activities:
-            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=(lambda x: MUTEX_PICKED if x != None else inverseColor)(mutex.pickedBy))
+            dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=(lambda x,y: MUTEX_PICKED if (x != None) and (x == y) else inverseColor)(mutex.pickedBy, activity))
         
-def createSemaphores(color, inverseColor):
+def createSemaphores(color, inverseColor, storedObjects):
     global dummyCounter
     
     # add color just like in createRects
     
-    semaphores_buf = semaphores.copy()
+    semaphores_buf = storedObjects.semaphores.copy()
     while len(semaphores_buf) != 0:
         
         semaphore = semaphores_buf.pop(0)
@@ -410,38 +438,27 @@ def initGlobals():
     global dummyCounter
     dummyCounter = 0
 
-def getImage(color='white', inverseColor='black', step=0, display=False):
+def getSingleImage(color='white', inverseColor='black', step=0, display=False):
     # macro method to generate an image, no matter if backward, forward or current
-    global historyOfDigraphs
-    global cursor
     global dot
     global dummyCounter
+    global storedObjects
     
     #check if first image is requested
-    if dot == None:
-        initGlobals()
+    if storedObjects == None:
+        storedObjects = StorageObject(tasks, activities, semaphores, mutexs, None)
         
-        createRects(color, inverseColor)
-        createMutexs(color, inverseColor)
-        createSemaphores(color, inverseColor)
-        historyOfDigraphs.append(dot)
+    storedObjects, stepsLeft = storedObjects.getStorageObject(step)
+    for _ in range(stepsLeft):
+        getNextFrame()
+        storedObjects.nextStorageObject = StorageObject(tasks, activities, semaphores, mutexs, storedObjects)
+        storedObjects = storedObjects.nextStorageObject
+    
+    initGlobals()
         
-    if cursor+step <= len(historyOfDigraphs)-1 and cursor+step >= 0:
-        dot = historyOfDigraphs[cursor+step]
-    elif cursor+step < 0:
-        dot = historyOfDigraphs[0]
-    elif cursor+step > len(historyOfDigraphs)-1:
-        for _ in range(cursor+step - (len(historyOfDigraphs)-1)):
-            getNextFrame()
-            
-            initGlobals()
-    
-            createRects(color, inverseColor)
-            createMutexs(color, inverseColor)
-            createSemaphores(color, inverseColor)
-            historyOfDigraphs.append(dot)
-    
-    cursor = (lambda x: 0 if x < 0 else x)(cursor+step)
+    createRects(color, inverseColor, storedObjects)
+    createMutexs(color, inverseColor, storedObjects)
+    createSemaphores(color, inverseColor, storedObjects)
     
     if dot != None:
         # do color stuff here
