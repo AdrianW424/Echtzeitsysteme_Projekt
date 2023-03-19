@@ -131,6 +131,14 @@
         input.type = 'file';
         input.addEventListener('change', () => {
             const file = input.files[0];
+            if (input.files.length > 1) {
+                alert("Please select only one file");
+                return;
+            }
+            if (!file.name.endsWith(".csv")) {
+                alert("Please select a CSV file");
+                return;
+            }
             const formData = new FormData();
             formData.append('file', file);
             fetch('/process_file', {
