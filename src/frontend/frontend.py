@@ -27,7 +27,8 @@ def loadCSVFile():
 
 @app.route("/savegif")
 def saveGif():
-    return generator.createGIF(color, inverseColor, 0, 0)
+    ###### TODO: Maybe set the duration of the gif ######
+    return generator.createGIF(color, inverseColor, 0, 0, 1000)
 
 @app.route("/darkmode_toggle", methods=['POST'])
 def darkmodeToggle():
