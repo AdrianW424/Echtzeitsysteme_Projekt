@@ -431,14 +431,14 @@ def getNextFrame():
             startPoint.currentValue = 1
             startPoint.initialValue -= 1
             
-        # activities sorted by ID
-    activeActivitiesSorted = sorted(getAllActiveActivities(), key=lambda activity: activity.ID)
+    # activities sorted by ID
+    activitiesSorted = sorted(activities, key=lambda activity: activity.ID)
     
-    for activity in activeActivitiesSorted:
+    for activity in activitiesSorted:
         activity.checkActivity()
-        
-    for activity in activeActivitiesSorted[1:: -1]:
-        activity.checkActivity()
+
+    for activity in activitiesSorted[:-1]:
+        activity.checkActivity(False)
             
 def getAllActiveActivities():
     activeActivities = []
