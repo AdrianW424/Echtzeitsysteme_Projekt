@@ -6,8 +6,14 @@
 </head>
 <body id="body">
     <center>
+        <h4 id="nocontent-warning"><i class="fa fa-exclamation" style="color: red"></i> No data loaded, use Load button to import CSV <i class="fa fa-exclamation" style="color: red"></i></h4>
         <div class="pngviewer-div" id="pngviewer-div" style="display: none;">
+            <h3>Flowchart Visualizer</h3>
             <img id="pngviewer"/>
+        </div>
+        <div class="editor-div" id="editor-div" style="display: none">
+            <h3>CSV Editor</h3>
+            <textarea name="editor" type="text" class="editor" id="editor" readonly="true"></textarea>
         </div>
     </center>
 </body>
@@ -97,6 +103,25 @@
     .pngviewer-div img{
         height: 100%;
     }
+
+    .editor-div {
+        width: 95%;
+        height: 80%;
+        border: 1px solid black;
+        border-radius: 5px;
+        margin-bottom: 120px;
+    }
+    .editor-div textarea {
+        width: 95%;
+        height: auto;
+        resize: none;
+        border: none;
+        font-size: 16px;
+        font-family: arial;
+        background-color: transparent;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
     
     .settings-window {
         position: fixed;
@@ -149,8 +174,18 @@
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const originalValue = document.getElementById('editor').value;
+                    const fileContents = e.target.result;
+                    document.getElementById('editor').value = originalValue + "\n" + fileContents;
+                    document.getElementById('editor').style.height = document.getElementById('editor').scrollHeight + 'px';
+                }
+                reader.readAsText(file);
                 document.getElementById('pngviewer').src = url;
                 document.getElementById('pngviewer-div').style.display = 'block';
+                document.getElementById('nocontent-warning').style.display = 'none';
+                document.getElementById('editor-div').style.display = 'block';
             });
         });
         input.click();
@@ -327,4 +362,9 @@
             else btns[i].style.color = "black";
         }
     });
+
+    document.getElementById("editor").addEventListener("input", function() {
+        this.style.height = this.scrollHeight + 'px';
+    });
+
 </script>

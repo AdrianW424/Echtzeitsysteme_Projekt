@@ -219,9 +219,7 @@ def openFromCSV(content=None, Path=None):
         
         if row["Activity_ID"] not in activities_IDs:
             activities_IDs.append(row["Activity_ID"])
-            activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))
-            print(row["Predecessor_Semaphore_ID"])
-        
+            activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))        
         # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
         for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
             if semaphore_ID != "None" and semaphore_ID not in semaphore_IDs:
@@ -262,7 +260,6 @@ def openFromCSV(content=None, Path=None):
                     semaphore_id = semaphore_id[:-1]
                     activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                     semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                    print(semaphore_id)
                 else:
                     semaphore_ids = []
                     while semaphore_id[-1] != ']':
@@ -276,7 +273,6 @@ def openFromCSV(content=None, Path=None):
                         for semaphore in semaphore_ids:
                             if not semaphore == semaphore_id:
                                 semaphores[semaphore_IDs.index(semaphore_id)].groupWith.append(semaphores[semaphore_IDs.index(semaphore)])
-                    print(semaphore_ids)
             
             # if end equals ']' -> end of or)
             
@@ -284,7 +280,6 @@ def openFromCSV(content=None, Path=None):
             else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
-                print(semaphore_id)
                 
 def erasePreviousData():
     global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, storedObjects
