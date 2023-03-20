@@ -1,6 +1,8 @@
 import pandas as pd
 import graphviz as gv
+import io
 from io import StringIO
+from PIL import Image
 
 import copy
 
@@ -429,14 +431,22 @@ def getNextFrame():
             startPoint.currentValue = 1
             startPoint.initialValue -= 1
             
-    # activities sorted by ID
-    activitiesSorted = sorted(activities, key=lambda activity: activity.ID)
+        # activities sorted by ID
+    activeActivitiesSorted = sorted(getAllActiveActivities(), key=lambda activity: activity.ID)
     
-    for activity in activitiesSorted:
+    for activity in activeActivitiesSorted:
         activity.checkActivity()
-
-    for activity in activitiesSorted[:-1]:
-        activity.checkActivity(False)
+        
+    for activity in activeActivitiesSorted[1:: -1]:
+        activity.checkActivity()
+            
+def getAllActiveActivities():
+    activeActivities = []
+    for activity in activities:
+        if activity.currentValue > 0:
+            activeActivities.append(activity)
+            
+    return activeActivities
 
 def getAllStartPoints():
     # get all activities that have no predecessor
@@ -481,21 +491,6 @@ def getSingleImage(color='white', inverseColor='black', step=0, display=False):
         if display:
             dot.view()
         return dot.pipe(format='svg')
-
-
-
-from PIL import Image
-import glob
-
-# Create the frames
-frames = []
-imgs = glob.glob("*.png")
-for i in imgs:
-    new_frame = Image.open(i)
-    frames.append(new_frame)
-
-from PIL import Image
-import io
 
 def createGIF(color='white', inverseColor='black', startIndex = 0, amount = 0, duration = 100, loop = 0):
     # 0 means all already generated images
