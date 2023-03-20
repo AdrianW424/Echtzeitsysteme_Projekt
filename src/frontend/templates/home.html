@@ -13,7 +13,8 @@
         </div>
         <div class="editor-div" id="editor-div" style="display: none">
             <h3>CSV Editor</h3>
-            <textarea name="editor" type="text" class="editor" id="editor" readonly="true"></textarea>
+            <textarea name="editor" type="text" class="editor" id="editor"></textarea>
+            <button id="editor-apply" class="btn editor-apply">Apply changes</button>
         </div>
     </center>
 </body>
@@ -219,6 +220,9 @@
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-off");
             document.getElementById("html").style.backgroundColor = "#eee";
             document.getElementById("html").style.color = "black";
+            document.getElementById("pngviewer-div").style.border = "1px solid black";
+            document.getElementById("editor-div").style.border = "1px solid black";
+            document.getElementById("editor").style.color = "black";
             document.getElementById("settings-window").style.backgroundColor = "#ddd";
             document.getElementById("task-bar").style.backgroundColor = "#ccc";
             var btns = document.getElementsByClassName("btn");
@@ -232,6 +236,9 @@
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-on");
             document.getElementById("html").style.backgroundColor = "#111";
             document.getElementById("html").style.color = "white";
+            document.getElementById("pngviewer-div").style.border = "1px solid white";
+            document.getElementById("editor-div").style.border = "1px solid white";
+            document.getElementById("editor").style.color = "white";
             document.getElementById("settings-window").style.backgroundColor = "#222";
             document.getElementById("task-bar").style.backgroundColor = "#333";
             var btns = document.getElementsByClassName("btn");
@@ -365,6 +372,22 @@
 
     document.getElementById("editor").addEventListener("input", function() {
         this.style.height = this.scrollHeight + 'px';
+    });
+
+    document.getElementById("editor-apply").addEventListener("click", function() {
+        var fileblob = new Blob([document.getElementById("editor").value], { type: "text/plain;charset=utf-8" });
+        const formData = new FormData();
+        formData.append('file', fileblob);
+        fetch('/process_file', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            const blob = new Blob([data], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            document.getElementById('pngviewer').src = url;
+        });
     });
 
 </script>
