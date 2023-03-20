@@ -31,3 +31,9 @@ LOW-Priority:
 * Activity mit Duration 0
 * Mutex mehrere
 * Mutexs unterschiedflichen Tasks zugeordnet, nicht immer den beiden gleichen Activities
+
+## Input-Prüfer:
+* Überprüfung der Spaltennamen sowie der einzelnen Zellen der Spalte (jeweils prüfen, ob eingegebene Daten korrekt sind)
+* Überprüfung der Spaltenanzahl, damit nicht zu viele und nicht zu wenige vorhanden sind
+
+* Alternativ einfach try-ecxept verwenden, ohne genaue Prüfung der einzelnen Zellen
