@@ -10,7 +10,8 @@ HIGH-Priority:
     * CSV-Editor bleibt groß - passt sich nicht an die Menge an Text an nach Löschen
     * Image-Download erst möglich, wenn überhaupt Datei vorhanden ist
     * Autoplay lässt sich auch abspielen, wenn kein Bild geladen wurde
-    * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep)
+    * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep
+    * Hover-Effekte bei Darkmode weg
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
