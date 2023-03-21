@@ -10,7 +10,7 @@ inverseColor = 'black'
 @app.route("/next")
 def createNextImage():
     return generator.getSingleImage(color, inverseColor, step=1)
-   
+
 @app.route("/prev")
 def getPrevImage():
     return generator.getSingleImage(color, inverseColor, step=-1)

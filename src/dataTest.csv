@@ -4,5 +4,5 @@ Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semap
 3,Task3,3,Activity3,1,36,Semaphore36,0,13,234,Mutex234
 4,Task4,4,Activity4,1,46,Semaphore46,0,24,234,Mutex234
 5,Task5,5,Activity5a,1,55,Semaphore55,0,56;65,None,None
-5,Task5,7,Activity5b,1,51;56,Semaphore51;Semaphore56,1;7,55,None,None
+5,Task5,7,Activity5b,1,51;56,Semaphore51;Semaphore56,1;1,55,None,None
 6,Task6,6,Activity6,1,65,Semaphore65,0,[36;46;16],None,None
