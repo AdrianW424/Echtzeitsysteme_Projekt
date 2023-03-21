@@ -81,7 +81,7 @@ class Activity:
                 if flag:
                     for groupSemaphore in semaphoreIN.groupWith:
                         semaphoresIN.remove(groupSemaphore)
-            elif semaphoreIN.currentValue == 0:
+            elif semaphoreIN.currentValue <= 0:
                 flag = False
                 break
         
@@ -101,7 +101,8 @@ class Activity:
     
     def releaseSemaphores(self):
         for semaphoreIN in self.semaphoresIN:
-                semaphoreIN.currentValue = 0
+                if semaphoreIN.currentValue > 0:
+                    semaphoreIN.currentValue -= 1
     
     def releaseMutexes(self):
         for mutex in self.pickedMutexs:
@@ -114,7 +115,7 @@ class Activity:
     
     def activateOutgoingSemaphores(self):
         for semaphoreOUT in self.semaphoresOUT:
-            semaphoreOUT.currentValue = 1
+            semaphoreOUT.currentValue += 1
 
 class Mutex:
     def __init__(self, ID, name, activities):
@@ -322,7 +323,7 @@ def createMutexs(color, inverseColor, storedObjects):
         if mutex.pickedBy != None:
             fillcolor = MUTEX_PICKED
             fontColor = 'black'
-        dot.node("Mutex"+str(mutex.ID), shape='polygon', style='filled', sides='5', label=mutex.name, color=inverseColor, fontcolor=fontColor, fillcolor=fillcolor)
+        dot.node("Mutex"+str(mutex.ID), shape='polygon', style='filled', sides='6', label=mutex.name, color=inverseColor, fontcolor=fontColor, fillcolor=fillcolor)
         for activity in mutex.activities:
             dot.edge("Mutex"+str(mutex.ID), "Activity"+str(activity.ID), arrowhead='none', style='dashed', splines='polyline', color=(lambda x,y: MUTEX_PICKED if (x != None) and (x == y) else inverseColor)(mutex.pickedBy, activity))
         
@@ -423,7 +424,7 @@ def getNextFrame():
     
     for startPoint in startPoints:
         if startPoint.currentValue <= 0:
-            startPoint.currentValue = 1
+            startPoint.currentValue += 1
             startPoint.initialValue -= 1
             
     # activities sorted by ID
