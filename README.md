@@ -10,7 +10,7 @@ HIGH-Priority:
     * CSV-Editor bleibt groß - passt sich nicht an die Menge an Text an nach Löschen
     * Image-Download erst möglich, wenn überhaupt Datei vorhanden ist
     * Autoplay lässt sich auch abspielen, wenn kein Bild geladen wurde
-    * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep
+    * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep)
     * Hover-Effekte bei Darkmode weg
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
@@ -18,7 +18,7 @@ HIGH-Priority:
     * Semaphoren currentValue nicht nur auf 0 und 1, sondern auch über 1 hinaus setzen können
     * Activity mit Duration 0 -> refresh für andere Activities (Problem derzeit: 
         * Activity nach Activity mit duration 0 nicht sofort grün geschaltet - erst in nächstem Takt wird die Activity danach ausgeführt - braucht einen Takt, obwohl 0 Takte angegeben)
-        * 88e544e - dataTest2.csv - Activity 2 mit Duration 0 wird übersprungen und Semaphore dahinter erst in nächstem Takt aktivier
+        * 88e544e - dataTest2.csv - Activity 2 mit Duration 0 wird übersprungen und Semaphore dahinter erst in nächstem Takt aktiviert
     * GIF Problem mit Bildergröße. Wenn Initialisierung von Semaphore verschwindet, wird Bild kleiner. Teil des GIFs ändert sich nicht
 
 MEDIUM-Priority:
