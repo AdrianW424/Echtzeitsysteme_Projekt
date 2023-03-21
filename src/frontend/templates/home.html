@@ -12,6 +12,7 @@
             <img id="pngviewer"/>
         </div>
         <div class="editor-div" id="editor-div" style="display: none">
+            <hr>
             <h3>CSV Editor</h3>
             <textarea name="editor" type="text" class="editor" id="editor"></textarea>
             <button id="editor-apply" class="btn editor-apply">Apply changes</button>
@@ -52,6 +53,7 @@
     html {
         font-family: arial;
         background-color: #eee;
+        overflow-x: hidden;
     }
     .task-bar {
         position: fixed;
@@ -94,7 +96,7 @@
     .pngviewer-div {
         width: 95%;
         height: 80%;
-        border: 1px solid black;
+        /* border: 1px solid black; */
         border-radius: 5px;
         margin-top: 20px;
         margin-bottom: 20px;
@@ -106,7 +108,7 @@
     .editor-div {
         width: 95%;
         height: auto;
-        border: 1px solid black;
+        /* border: 1px solid black; */
         border-radius: 5px;
         margin-bottom: 120px;
     }
@@ -246,8 +248,8 @@
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-off");
             document.getElementById("html").style.backgroundColor = "#eee";
             document.getElementById("html").style.color = "black";
-            document.getElementById("pngviewer-div").style.border = "1px solid black";
-            document.getElementById("editor-div").style.border = "1px solid black";
+            // document.getElementById("pngviewer-div").style.border = "1px solid black";
+            // document.getElementById("editor-div").style.border = "1px solid black";
             document.getElementById("editor").style.color = "black";
             document.getElementById("settings-window").style.backgroundColor = "#ddd";
             document.getElementById("task-bar").style.backgroundColor = "#ccc";
@@ -262,8 +264,8 @@
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-on");
             document.getElementById("html").style.backgroundColor = "#111";
             document.getElementById("html").style.color = "white";
-            document.getElementById("pngviewer-div").style.border = "1px solid white";
-            document.getElementById("editor-div").style.border = "1px solid white";
+            // document.getElementById("pngviewer-div").style.border = "1px solid white";
+            // document.getElementById("editor-div").style.border = "1px solid white";
             document.getElementById("editor").style.color = "white";
             document.getElementById("settings-window").style.backgroundColor = "#222";
             document.getElementById("task-bar").style.backgroundColor = "#333";
@@ -293,12 +295,12 @@
     document.getElementById("btn-settings").addEventListener('click', function() {
         if (document.getElementById("settings-window").style.display == "block") {
             document.getElementById("settings-window").style.display = "none";
-            document.getElementById("body").style.width = "100vw";
-            document.getElementById("body").style.marginLeft = "0vw";
+            document.getElementById("body").style.width = "100%";
+            document.getElementById("body").style.marginLeft = "0%";
         } else {
             document.getElementById("settings-window").style.display = "block";
-            document.getElementById("body").style.width = "75vw";
-            document.getElementById("body").style.marginRight = "25vw";
+            document.getElementById("body").style.width = "75%";
+            document.getElementById("body").style.marginRight = "25%";
         }
     });
 
