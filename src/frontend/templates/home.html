@@ -4,7 +4,7 @@
     <title>Flowchart Viewer</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
-<body id="body">
+<body id="body" onload="load()">
     <center>
         <h4 id="nocontent-warning"><i class="fa fa-exclamation" style="color: red; margin-top: 40vh"></i> No data loaded, use Load button to import CSV <i class="fa fa-exclamation" style="color: red"></i></h4>
         <div class="pngviewer-div" id="pngviewer-div" style="display: none;">
@@ -42,7 +42,7 @@
             <button class="btn btn-forward" id="btn-forward" disabled="true"><i class="fa fa-forward"></i><br>Forward</button>
             <button class="btn btn-autoplay" id="btn-autoplay" disabled="true" style="display: none"><i class="fa fa-play"></i><br>Autoplay</button>
             <button class="btn btn-save" id="btn-save" disabled="true"><i class="fa fa-save"></i><br>Save Image</button>
-            <button class="btn btn-settings" id="btn-settings"><i class="fa fa-cog"></i><br>Settings</button>
+            <button class="btn btn-settings" id="btn-settings" disabled="true"><i class="fa fa-cog"></i><br>Settings</button>
         </div>
     </div>
 </footer>
@@ -83,9 +83,6 @@
         margin-top: 10px;
         margin-left: 20px;
         margin-right: 20px;
-    }
-    .btn:hover {
-        background-color: #7d7d7d;
     }
     .btn:active {
         background-color: #3eae3c;
@@ -156,6 +153,25 @@
 </style>
 
 <script>
+    var darkmode = false;
+    function load() {
+        var btns = document.getElementsByClassName("btn");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('mouseover', function() {
+                this.style.backgroundColor = "#7d7d7d";
+            });
+        }
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('mouseout', function() {
+                if (darkmode == true) {
+                    this.style.backgroundColor = "#222";
+                } else {
+                    this.style.backgroundColor = "#ddd";
+                }
+            });
+        }
+    }
+
     document.getElementById("btn-file").addEventListener('click', function () {
         const input = document.createElement('input');
         input.type = 'file';
@@ -187,6 +203,7 @@
                     document.getElementById("btn-forward").disabled = false;
                     document.getElementById("btn-autoplay").disabled = false;
                     document.getElementById("btn-save").disabled = false;
+                    document.getElementById("btn-settings").disabled = false;
                     const fileContents = e.target.result;
                     document.getElementById('editor').value = originalValue + "\n" + fileContents;
                     document.getElementById('editor').style.height = document.getElementById('editor').scrollHeight + 'px';
@@ -221,7 +238,6 @@
             });
     });
 
-    var darkmode = false;
     document.getElementById("darkmode-toggle").addEventListener('click', function() {
         if (darkmode == true) {
             darkmode = false;
