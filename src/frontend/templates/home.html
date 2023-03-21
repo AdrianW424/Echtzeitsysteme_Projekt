@@ -38,10 +38,10 @@
     <div class="task-bar" id="task-bar">
         <div class="task-bar-container">
             <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i><br>Load CSV</button>
-            <button class="btn btn-backward" id="btn-backward"><i class="fa fa-backward"></i><br>Backward</i></button>
-            <button class="btn btn-forward" id="btn-forward"><i class="fa fa-forward"></i><br>Forward</button>
-            <button class="btn btn-autoplay" id="btn-autoplay" style="display: none"><i class="fa fa-play"></i><br>Autoplay</button>
-            <button class="btn btn-save" id="btn-save"><i class="fa fa-save"></i><br>Save Image</button>
+            <button class="btn btn-backward" id="btn-backward" disabled="true"><i class="fa fa-backward"></i><br>Backward</i></button>
+            <button class="btn btn-forward" id="btn-forward" disabled="true"><i class="fa fa-forward"></i><br>Forward</button>
+            <button class="btn btn-autoplay" id="btn-autoplay" disabled="true" style="display: none"><i class="fa fa-play"></i><br>Autoplay</button>
+            <button class="btn btn-save" id="btn-save" disabled="true"><i class="fa fa-save"></i><br>Save Image</button>
             <button class="btn btn-settings" id="btn-settings"><i class="fa fa-cog"></i><br>Settings</button>
         </div>
     </div>
@@ -107,7 +107,7 @@
 
     .editor-div {
         width: 95%;
-        height: 80%;
+        height: auto;
         border: 1px solid black;
         border-radius: 5px;
         margin-bottom: 120px;
@@ -115,7 +115,7 @@
     .editor-div textarea {
         width: 95%;
         height: auto;
-        resize: none;
+        resize: vertical;
         border: none;
         font-size: 16px;
         font-family: arial;
@@ -179,9 +179,14 @@
             .then(data => {
                 const blob = new Blob([data], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
+                document.getElementById("editor").value = "";
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const originalValue = document.getElementById('editor').value;
+                    document.getElementById("btn-backward").disabled = false;
+                    document.getElementById("btn-forward").disabled = false;
+                    document.getElementById("btn-autoplay").disabled = false;
+                    document.getElementById("btn-save").disabled = false;
                     const fileContents = e.target.result;
                     document.getElementById('editor').value = originalValue + "\n" + fileContents;
                     document.getElementById('editor').style.height = document.getElementById('editor').scrollHeight + 'px';
@@ -374,10 +379,6 @@
         }
     });
 
-    document.getElementById("editor").addEventListener("input", function() {
-        this.style.height = this.scrollHeight + 'px';
-    });
-
     document.getElementById("editor-apply").addEventListener("click", function() {
         var fileblob = new Blob([document.getElementById("editor").value], { type: "text/plain;charset=utf-8" });
         const formData = new FormData();
@@ -392,6 +393,10 @@
             const url = URL.createObjectURL(blob);
             document.getElementById('pngviewer').src = url;
         });
+    });
+
+    document.getElementById("editor").addEventListener("input", function() {
+        this.height = "fit-content";
     });
 
 </script>
