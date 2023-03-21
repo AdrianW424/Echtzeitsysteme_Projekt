@@ -6,8 +6,10 @@
 ## TODO:
 HIGH-Priority:
 * Frontend:
-    * vielleicht kleines Fenster mit CSV-Inhalt. Sowas wie Editor, in dem man live code ändern kann
-    * Frontend CSV-Editor - Button zum neu laden des Bildes fertig machen
+    * mehrfaches Laden von Dateien in CSV-Editor hängt neuen Inhalt an den alten an - Lösung: beim Laden neuer Datei wird der alte Inhalt gelöscht
+    * CSV-Editor bleibt groß - passt sich nicht an die Menge an Text an nach Löschen
+    * Image-Download erst möglich, wenn überhaupt Datei vorhanden ist
+    * Autoplay lässt sich auch abspielen, wenn kein Bild geladen wurde
     * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep)
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
