@@ -2,14 +2,14 @@
 digraph {
 	graph [bgcolor=transparent]
 	size="10,10"
-	Activity1 [label="{Task1|Activity1}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
+	Activity1 [label="{Task1|Activity1}" color=black fillcolor=green fontcolor=black shape=record style="rounded,filled"]
 	Activity2 [label="{Task2|Activity2}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
 	Activity3 [label="{Task3|Activity3}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
 	Activity4 [label="{Task4|Activity4}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
 	Activity5 [label="{Task5|Activity5a}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
 	Activity7 [label="{Task5|Activity5b}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
 	Activity6 [label="{Task6|Activity6}" color=black fillcolor=transparent fontcolor=black shape=record style="rounded,filled"]
-	Mutex234 [label=Mutex234 color=black fillcolor=transparent fontcolor=black shape=polygon sides=5 style=filled]
+	Mutex234 [label=Mutex234 color=black fillcolor=transparent fontcolor=black shape=polygon sides=6 style=filled]
 	Mutex234 -> Activity2 [arrowhead=none color=black splines=polyline style=dashed]
 	Mutex234 -> Activity3 [arrowhead=none color=black splines=polyline style=dashed]
 	Mutex234 -> Activity4 [arrowhead=none color=black splines=polyline style=dashed]
