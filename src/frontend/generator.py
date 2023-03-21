@@ -5,7 +5,7 @@ from io import StringIO
 from PIL import Image
 import copy
 
-import InputChecker as ic
+import frontend.InputChecker as ic
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -191,7 +191,7 @@ def openFromCSV(content):
     # content for real use, Path for testing and development
     
     inputChecker = ic.InputChecker()
-    flag, res = inputChecker.checkInput(content, []) 
+    flag, res = inputChecker.checkInput(content, [inputChecker.checkColumns, inputChecker.checkEmptyCells, inputChecker.checkForUniqueIDs, inputChecker.checkColumnTypes, inputChecker.checkSemaphores]) 
     
     if not flag:
         return False, res
