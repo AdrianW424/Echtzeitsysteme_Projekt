@@ -2,10 +2,10 @@ import pandas as pd
 import graphviz as gv
 import io
 from io import StringIO
-from PIL import Image
+from PIL import Image, ImageOps
 import copy
 
-import frontend.InputChecker as ic
+import InputChecker as ic
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -187,8 +187,14 @@ mutexs = []
 
 storedObjects = None
 
-def openFromCSV(content):
+def openFromCSV(content=None, path=None):
     # content for real use, Path for testing and development
+    
+    if content == None:
+        if path == None:
+            return False, "No content or path given"
+        else:
+            pass
     
     inputChecker = ic.InputChecker()
     flag, res = inputChecker.checkInput(content, [inputChecker.checkColumns, inputChecker.checkEmptyCells, inputChecker.checkForUniqueIDs, inputChecker.checkColumnTypes, inputChecker.checkSemaphores]) 
@@ -512,8 +518,20 @@ def createGIF(color='white', inverseColor='black', startIndex = 0, amount = 0, d
             listOfImages.append(Image.open(io.BytesIO(dot.pipe(format='png'))))
             startObject = startObject.nextStorageObject
             amount -= 1
+            
+    addBorderToImages(listOfImages, color)
 
     gif_buffer = io.BytesIO()
     listOfImages[0].save(gif_buffer, format='GIF', append_images=listOfImages[1:], save_all=True, duration=duration, loop=loop)
     
     return gif_buffer.getvalue()    
+
+def addBorderToImages(images, color):
+    max_height = max(image.height for image in images)
+    max_width = max(image.width for image in images)
+    
+    for image, i in images:
+        delta_h = max_height - image.height
+        delta_w = max_width - image.width
+        padding = (delta_w//2, delta_h//2, delta_w-(delta_w//2), delta_h-(delta_h//2))
+        images[i] = ImageOps.expand(image, padding, fill=color)
