@@ -354,7 +354,7 @@ def createSemaphores(color, inverseColor, storedObjects):
                     # this is the edge with a point in the middle
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
                     
                     # this is this init-thing (edge with point at the end)
@@ -362,7 +362,7 @@ def createSemaphores(color, inverseColor, storedObjects):
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
             else:
-                dot.edge("Activity"+str(semaphore.activityOUT.ID), middleDummyName, label=semaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
+                dot.edge("Activity"+str(semaphore.activityOUT.ID), middleDummyName, label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
             
             # after the groupSemaphores
             colorOfLastSemaphore = color
@@ -377,7 +377,7 @@ def createSemaphores(color, inverseColor, storedObjects):
                     # this is the edge with a point in the middle
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter), middleDummyName, label=groupSemaphore.name + (lambda x: f"\n{groupSemaphore.currentValue}" if x.currentValue > 1 else "")(groupSemaphore), arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
                     
                     # this is this init-thing (edge with point at the end)
@@ -385,7 +385,7 @@ def createSemaphores(color, inverseColor, storedObjects):
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), middleDummyName, label=groupSemaphore.name, arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Activity"+str(groupSemaphore.activityOUT.ID), middleDummyName, label=groupSemaphore.name + (lambda x: f"\n{groupSemaphore.currentValue}" if x.currentValue > 1 else "")(groupSemaphore), arrowhead='none', splines='polyline', color=color, fontcolor=inverseColor)
                 
                 semaphores_buf.remove(groupSemaphore)
                 
@@ -399,24 +399,24 @@ def createSemaphores(color, inverseColor, storedObjects):
                 if semaphore.initialValue > 0:
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), arrowhead='onormal', splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
                     dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue), color=color, fontcolor=inverseColor)
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, arrowhead='onormal', splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), arrowhead='onormal', splines='polyline', color=color, fontcolor=inverseColor)
             else:
                 if semaphore.initialValue > 0:
                     dot.node("Dummy" + str(dummyCounter), shape='point', width="0.01", height="0.01", color=color)
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
-                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Dummy" + str(dummyCounter), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), splines='polyline', color=color, fontcolor=inverseColor)
                     dummyCounter += 1
                     dot.node("Dummy" + str(dummyCounter), shape='point', xlabel=(lambda valorem: '' if valorem == 1 else str(valorem))(semaphore.initialValue), color=color, fontcolor=inverseColor)
                     dot.edge("Dummy" + str(dummyCounter-1), "Dummy" + str(dummyCounter), arrowhead='none', splines='polyline', color=color)
                     dummyCounter += 1
                 else:
-                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name, splines='polyline', color=color, fontcolor=inverseColor)
+                    dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), splines='polyline', color=color, fontcolor=inverseColor)
 
 def getNextFrame():
     # try to initialize semaphores
