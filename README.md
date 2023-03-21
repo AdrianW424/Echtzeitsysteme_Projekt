@@ -20,8 +20,6 @@ HIGH-Priority:
     * Activity mit Duration 0 -> refresh für andere Activities (Problem derzeit: 
         * Activity nach Activity mit duration 0 nicht sofort grün geschaltet - erst in nächstem Takt wird die Activity danach ausgeführt - braucht einen Takt, obwohl 0 Takte angegeben)
         * 88e544e - dataTest2.csv - Activity 2 mit Duration 0 wird übersprungen und Semaphore dahinter erst in nächstem Takt aktiviert
-    * GIF Problem mit Bildergröße. Wenn Initialisierung von Semaphore verschwindet, wird Bild kleiner. Teil des GIFs ändert sich nicht
-    ==> Lösung: weißen Rahmen einfügen, sodass jedes Bild gleich groß ist
 
 MEDIUM-Priority:
 * wow, such empty

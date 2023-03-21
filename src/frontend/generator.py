@@ -187,14 +187,8 @@ mutexs = []
 
 storedObjects = None
 
-def openFromCSV(content=None, path=None):
+def openFromCSV(content):
     # content for real use, Path for testing and development
-    
-    if content == None:
-        if path == None:
-            return False, "No content or path given"
-        else:
-            pass
     
     inputChecker = ic.InputChecker()
     flag, res = inputChecker.checkInput(content, [inputChecker.checkColumns, inputChecker.checkEmptyCells, inputChecker.checkForUniqueIDs, inputChecker.checkColumnTypes, inputChecker.checkSemaphores]) 
@@ -530,7 +524,7 @@ def addBorderToImages(images, color):
     max_height = max(image.height for image in images)
     max_width = max(image.width for image in images)
     
-    for image, i in images:
+    for i, image in enumerate(images):
         delta_h = max_height - image.height
         delta_w = max_width - image.width
         padding = (delta_w//2, delta_h//2, delta_w-(delta_w//2), delta_h-(delta_h//2))

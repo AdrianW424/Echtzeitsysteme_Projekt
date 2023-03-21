@@ -21,10 +21,12 @@ def loadCSVFile():
         file = request.files['file']
         if file:
             content = file.read().decode('utf-8')
-            #### TODO: Implement error handling ####
-            generator.openFromCSV(content)
-            ########################################
-            return generator.getSingleImage(color, inverseColor, step=0, display=True)
+            res = generator.openFromCSV(content)
+            if res[0] == False:
+                # TODO: Show error message
+                return 'None'
+            else:
+                return generator.getSingleImage(color, inverseColor, step=0)
     return "Error", 400
 
 @app.route("/savegif")
