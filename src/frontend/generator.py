@@ -3,8 +3,9 @@ import graphviz as gv
 import io
 from io import StringIO
 from PIL import Image
-
 import copy
+
+import InputChecker as ic
 
 class Task:
     def __init__(self, ID, name, activities):
@@ -186,15 +187,18 @@ mutexs = []
 
 storedObjects = None
 
-def openFromCSV(content=None, Path=None):
+def openFromCSV(content):
     # content for real use, Path for testing and development
     
+    inputChecker = ic.InputChecker()
+    flag, res = inputChecker.checkInput(content, []) 
+    
+    if not flag:
+        return False, res
+    
+    df = res
+    
     erasePreviousData()
-
-    if content != None:
-        df = pd.read_csv(StringIO(content), sep=',')
-    else:
-        df = pd.read_csv(Path, sep=',')
 
     # split seperated values into list elements
     df["Semaphore_ID"] = df["Semaphore_ID"].astype(str)
@@ -281,6 +285,8 @@ def openFromCSV(content=None, Path=None):
             else:
                 activity.semaphoresIN.append(semaphores[semaphore_IDs.index(semaphore_id)])
                 semaphores[semaphore_IDs.index(semaphore_id)].activityIN = activity
+                
+    return True, "all fine"
                 
 def erasePreviousData():
     global activities, activities_IDs, tasks, tasks_IDs, semaphores, semaphore_IDs, mutexs, mutex_IDs, dot, storedObjects
