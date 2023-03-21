@@ -12,6 +12,7 @@ HIGH-Priority:
     * Autoplay lässt sich auch abspielen, wenn kein Bild geladen wurde
     * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep)
     * Hover-Effekte bei Darkmode weg
+    * InputChecker in Frontend integrieren (Fehlermeldungen, wenn falsche Daten eingegeben werden)
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * Problem, dass Initialwert gesetzt wird, obwohl Semaphore im gleichen Schritt Wert von Activity zuvor bekommt
@@ -22,8 +23,7 @@ HIGH-Priority:
     * GIF Problem mit Bildergröße. Wenn Initialisierung von Semaphore verschwindet, wird Bild kleiner. Teil des GIFs ändert sich nicht
 
 MEDIUM-Priority:
-* Backend:
-    * Programm unabhängig gegenüber falschen Eingaben in CSV-Datei machen - Input-Prüfer schreiben (überprüft die Datei, bevor sie eingelesen wird)
+* wow, such empty
 
 LOW-Priority:
 * Backend:
@@ -38,5 +38,4 @@ LOW-Priority:
 ## Input-Prüfer:
 * Überprüfung der Spaltennamen sowie der einzelnen Zellen der Spalte (jeweils prüfen, ob eingegebene Daten korrekt sind)
 * Überprüfung der Spaltenanzahl, damit nicht zu viele und nicht zu wenige vorhanden sind
-
 * Alternativ einfach try-ecxept verwenden, ohne genaue Prüfung der einzelnen Zellen
