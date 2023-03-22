@@ -6,13 +6,10 @@
 ## TODO:
 HIGH-Priority:
 * Frontend:
-    * mehrfaches Laden von Dateien in CSV-Editor hängt neuen Inhalt an den alten an - Lösung: beim Laden neuer Datei wird der alte Inhalt gelöscht
-    * CSV-Editor bleibt groß - passt sich nicht an die Menge an Text an nach Löschen
-    * Image-Download erst möglich, wenn überhaupt Datei vorhanden ist
-    * Autoplay lässt sich auch abspielen, wenn kein Bild geladen wurde
     * Abbrechen der Animation. Zum Beispiel mit Timer, dessen Intervall zurückgesetzt wird, sobald Button geklickt (statt sleep)
-    * Hover-Effekte bei Darkmode weg
+    * Angabe von der Dauer der GIF einbauen
     * InputChecker in Frontend integrieren (Fehlermeldungen, wenn falsche Daten eingegeben werden)
+    * wenn mit CSV-Editor Falsches eingegeben wurde, dann lässt sich das Bild (obwohl nicht vorhanden) trotzdem downloaden und auch die Animationstasten funktionieren
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * Problem, dass Initialwert gesetzt wird, obwohl Semaphore im gleichen Schritt Wert von Activity zuvor bekommt - Semaphore müsste Wert schon zeitiger und nicht erst nach einem Takt der Leere bekommen
