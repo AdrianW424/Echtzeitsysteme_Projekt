@@ -31,28 +31,32 @@ class Activity:
         if withAlreadyRunning and (self.currentValue > 0 or self.checkAllIncomingSemaphores()):
             # pick mutexes
             if self.checkAllMutexes():
-                self.runActivity()
+                return self.runActivity()
         elif not withAlreadyRunning and self.checkAllIncomingSemaphores():
             # pick mutexes
             if self.checkAllMutexes():
-                self.runActivity(withAlreadyRunning)
+                return self.runActivity(withAlreadyRunning)
+        return False
         
     def runActivity(self, withAlreadyRunning=True):
         if withAlreadyRunning:
             self.currentValue = 1
             if self.currentDuration > 0:
                 self.currentDuration -= 1
+                return False
             else:
                 self.currentValue = 0
                 self.currentDuration = self.duration
                 self.releaseSemaphores()
                 self.releaseMutexes()
                 self.activateOutgoingSemaphores()
+                return True
         else:
             if self.currentValue <= 0:
                 self.currentValue = 1
                 if self.currentDuration > 0:
                     self.currentDuration -= 1
+                    return False
                 else:
                     # possibility, if there is an activity with duration 0
                     self.currentValue = 0
@@ -60,6 +64,7 @@ class Activity:
                     self.releaseSemaphores()
                     self.releaseMutexes()
                     self.activateOutgoingSemaphores()
+                    return True
             
     
     def checkAllIncomingSemaphores(self):
@@ -441,6 +446,13 @@ def getNextFrame():
 
     for activity in activitiesSorted[:-1]:
         activity.checkActivity(False)
+        
+    startPoints = getAllStartPoints()
+    
+    for startPoint in startPoints:
+        if startPoint.currentValue <= 0:
+            startPoint.currentValue += 1
+            startPoint.initialValue -= 1
             
 def getAllActiveActivities():
     activeActivities = []
