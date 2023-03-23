@@ -55,6 +55,11 @@ def darkmodeToggle():
 
 @app.route("/")
 def home():
+    global color
+    global inverseColor
+    
+    color = 'white'
+    inverseColor = 'black'
     return render_template("./home.html")
 
 if __name__ == "__main__":
