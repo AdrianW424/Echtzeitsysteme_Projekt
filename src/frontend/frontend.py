@@ -23,8 +23,8 @@ def loadCSVFile():
             content = file.read().decode('utf-8')
             res = generator.openFromCSV(content)
             if res[0] == False:
-                # TODO: Show error message
-                return 'None'
+                # TODO: Show error message and disable buttons
+                return res[1]
             else:
                 return generator.getSingleImage(color, inverseColor, step=0)
     return "Error", 400
