@@ -12,7 +12,6 @@ HIGH-Priority:
     * wenn mit CSV-Editor Falsches eingegeben wurde, dann lässt sich das Bild (obwohl nicht vorhanden) trotzdem downloaden und auch die Animationstasten funktionieren
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
-        * Problem, dass Initialwert gesetzt wird, obwohl Semaphore im gleichen Schritt Wert von Activity zuvor bekommt - Semaphore müsste Wert schon zeitiger und nicht erst nach einem Takt der Leere bekommen
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
     * Activity mit Duration 0 -> refresh für andere Activities (Problem derzeit: 
         * Activity nach Activity mit duration 0 nicht sofort grün geschaltet - erst in nächstem Takt wird die Activity danach ausgeführt - braucht einen Takt, obwohl 0 Takte angegeben)
