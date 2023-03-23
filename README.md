@@ -11,6 +11,7 @@ HIGH-Priority:
     * InputChecker in Frontend integrieren (Fehlermeldungen, wenn falsche Daten eingegeben werden)
     * wenn mit CSV-Editor Falsches eingegeben wurde, dann lässt sich das Bild (obwohl nicht vorhanden) trotzdem downloaden und auch die Animationstasten funktionieren
 * Backend:
+    * Semaphore currentValue abziehen, sobald Activity beginnt (nicht sobald beendet)
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
     * Activity mit Duration 0 -> refresh für andere Activities (Problem derzeit: 
