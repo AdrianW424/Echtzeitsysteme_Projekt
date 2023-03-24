@@ -26,47 +26,31 @@ class Activity:
         self.currentValue = 0
         self.currentDuration = duration
         
-    def checkActivity(self, withAlreadyRunning=True):
+    def checkActivity(self):
         # check if activity is already running or (if all incoming semaphores are active and all mutexes are free)
-        if withAlreadyRunning and (self.currentValue > 0 or self.checkAllIncomingSemaphores()):
+        if self.currentValue > 0 or self.checkAllIncomingSemaphores():
             # pick mutexes
             if self.checkAllMutexes():
                 return self.runActivity()
-        elif not withAlreadyRunning and self.checkAllIncomingSemaphores():
-            # pick mutexes
-            if self.checkAllMutexes():
-                return self.runActivity(withAlreadyRunning)
-        return False
+        return False, False
         
-    def runActivity(self, withAlreadyRunning=True):
-        if withAlreadyRunning:
+    def runActivity(self):
+        if self.currentDuration == self.duration:
+            self.releaseSemaphores()
+            for semaphore in self.semaphoresIN:
+                semaphore.checkSemaphore()
+    
+        if self.currentDuration > 0:
             self.currentValue = 1
-            if self.currentDuration > 0:
-                if self.currentDuration == self.duration:
-                    self.releaseSemaphores()
-                self.currentDuration -= 1
-                return False
-            else:
-                self.currentValue = 0
-                self.currentDuration = self.duration
-                self.releaseMutexes()
-                self.activateOutgoingSemaphores()
-                return True
+            self.currentDuration -= 1
+            return False, True
         else:
-            if self.currentValue <= 0:
-                self.currentValue = 1
-                if self.currentDuration > 0:
-                    if self.currentDuration == self.duration:
-                        self.releaseSemaphores()
-                    self.currentDuration -= 1
-                    return False
-                else:
-                    # possibility, if there is an activity with duration 0
-                    self.currentValue = 0
-                    self.currentDuration = self.duration
-                    self.releaseMutexes()
-                    self.activateOutgoingSemaphores()
-                    return True
+            # possibility, if there is an activity with duration 0
+            self.currentValue = 0
+            self.currentDuration = self.duration
+            self.releaseMutexes()
+            self.activateOutgoingSemaphores()
+            return True, True
             
     
     def checkAllIncomingSemaphores(self):
@@ -141,6 +125,13 @@ class Semaphore:
         self.activityIN = activityIN
         self.activityOUT = activityOUT
         self.currentValue = 0
+        
+    def checkSemaphore(self):
+        if self.currentValue <= 0 and self.initialValue > 0:
+            self.currentValue += 1
+            self.initialValue -= 1
+            return True
+        return False
         
 class StorageObject:
     length = 0
@@ -431,30 +422,43 @@ def createSemaphores(color, inverseColor, storedObjects):
                 else:
                     dot.edge("Activity"+str(semaphore.activityOUT.ID), "Activity"+str(semaphore.activityIN.ID), label=semaphore.name + (lambda x: f"\n{x.currentValue}" if x.currentValue > 1 else "")(semaphore), splines='polyline', color=color, fontcolor=inverseColor)
 
-def getNextFrame():
-    # try to initialize semaphores
-    startPoints = getAllStartPoints()
+def getNextFrameNew():
+    listOfActivities = getAllActiveActivities()
+    listOfAlreadyRunned = []
+    for semaphore in getAllActiveSemaphores():
+        for _ in range(semaphore.currentValue):
+            listOfActivities.append(semaphore.activityIN)
+    listOfActivities = sorted(listOfActivities, key=lambda activity: activity.ID)
+    # we also need all activities where an active semaphore is leading to
     
-    for startPoint in startPoints:
-        if startPoint.currentValue <= 0:
-            startPoint.currentValue += 1
-            startPoint.initialValue -= 1
-            
-    # activities sorted by ID
-    activitiesSorted = sorted(activities, key=lambda activity: activity.ID)
+    if len(listOfActivities) == 0:
+        startPoints = getAllStartPoints()
     
-    for activity in activitiesSorted:
-        activity.checkActivity()
-
-    for activity in activitiesSorted[:-1]:
-        activity.checkActivity(False)
+        for startPoint in startPoints:
+            startPoint.checkSemaphore()
+            listOfActivities.append(startPoint.activityIN)
+        listOfActivities = sorted(listOfActivities, key=lambda activity: activity.ID)
         
-    startPoints = getAllStartPoints()
-    
-    for startPoint in startPoints:
-        if startPoint.currentValue <= 0:
-            startPoint.currentValue += 1
-            startPoint.initialValue -= 1
+    while len(listOfActivities) > 0:
+        activity = listOfActivities.pop(0)
+        
+        # aufpassen, dass die gleiche Aktivität nicht mehrfach ausgeführt wird, wenn sie zwischendurch nicht beendet wurde
+        
+        if activity.ID not in listOfAlreadyRunned:
+            flag = activity.checkActivity()
+            if flag[0]:
+                for semaphore in activity.semaphoresOUT:
+                    listOfActivities.append(semaphore.activityIN)
+                for mutex in activity.mutexes:
+                    for activity in mutex.activities:
+                        listOfActivities.append(activity)
+                listOfActivities = sorted(listOfActivities, key=lambda activity: activity.ID)
+                if activity.ID in listOfAlreadyRunned:
+                    listOfAlreadyRunned.remove(activity.ID)
+            else:
+                if flag[1]:
+                    listOfAlreadyRunned.append(activity.ID)
+                listOfActivities = list(filter(lambda x: x.ID != activity.ID, listOfActivities))
             
 def getAllActiveActivities():
     activeActivities = []
@@ -463,6 +467,14 @@ def getAllActiveActivities():
             activeActivities.append(activity)
             
     return activeActivities
+
+def getAllActiveSemaphores():
+    activeSemaphores = []
+    for semaphore in semaphores:
+        if semaphore.currentValue > 0:
+            activeSemaphores.append(semaphore)
+            
+    return activeSemaphores
 
 def getAllStartPoints():
     # get all activities that have no predecessor
@@ -493,7 +505,7 @@ def getSingleImage(color='white', inverseColor='black', step=0, display=False):
         
     storedObjects, stepsLeft = storedObjects.getStorageObject(step)
     for _ in range(stepsLeft):
-        getNextFrame()
+        getNextFrameNew()
         storedObjects.nextStorageObject = StorageObject(tasks, activities, semaphores, mutexs, storedObjects)
         storedObjects = storedObjects.nextStorageObject
     

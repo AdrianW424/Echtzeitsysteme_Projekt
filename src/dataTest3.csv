@@ -1,0 +1,4 @@
+Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semaphore_Name,Semaphore_Initial_Value,Predecessor_Semaphore_ID,Mutex_ID,Mutex_Name
+1,Task1,1,Activity1,1,12,Semaphore12,0,None,None,None
+2,Task2,2,Activity2a,1,23,Semaphore23,1,12,None,None
+2,Task2,3,Activity2b,1,None,None,1,23,None,None
