@@ -42,12 +42,13 @@ class Activity:
         if withAlreadyRunning:
             self.currentValue = 1
             if self.currentDuration > 0:
+                if self.currentDuration == self.duration:
+                    self.releaseSemaphores()
                 self.currentDuration -= 1
                 return False
             else:
                 self.currentValue = 0
                 self.currentDuration = self.duration
-                self.releaseSemaphores()
                 self.releaseMutexes()
                 self.activateOutgoingSemaphores()
                 return True
@@ -55,13 +56,14 @@ class Activity:
             if self.currentValue <= 0:
                 self.currentValue = 1
                 if self.currentDuration > 0:
+                    if self.currentDuration == self.duration:
+                        self.releaseSemaphores()
                     self.currentDuration -= 1
                     return False
                 else:
                     # possibility, if there is an activity with duration 0
                     self.currentValue = 0
                     self.currentDuration = self.duration
-                    self.releaseSemaphores()
                     self.releaseMutexes()
                     self.activateOutgoingSemaphores()
                     return True
