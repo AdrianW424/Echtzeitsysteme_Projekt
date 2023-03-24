@@ -11,14 +11,11 @@ HIGH-Priority:
     * InputChecker in Frontend integrieren (Fehlermeldungen, wenn falsche Daten eingegeben werden)
     * wenn mit CSV-Editor Falsches eingegeben wurde, dann lässt sich das Bild (obwohl nicht vorhanden) trotzdem downloaden und auch die Animationstasten funktionieren
 * Backend:
-    * Möglichkeit, keine Semaphoren zu haben
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
-    * Activity mit Duration 0 -> refresh für andere Activities (Problem derzeit: 
-        * Activity nach Activity mit duration 0 nicht sofort grün geschaltet - erst in nächstem Takt wird die Activity danach ausgeführt - braucht einen Takt, obwohl 0 Takte angegeben)
-        * 88e544e - dataTest2.csv - Activity 2 mit Duration 0 wird übersprungen und Semaphore dahinter erst in nächstem Takt aktiviert
-    ==> gemeinsamer fix: neuen Animationsalgorithmus entwickeln mit Animationshandler (Noch überlegen. Wichtig ist, dass auf die Priorität der Activities geachtet wird. Weiterhin auf die korrekte Ausführung der Activities mit Duration 0 sowie das Setzen von Initialwerten für Semaphoren)
-    ==> Wichtig: dadurch, dass Semaphoren mehrfach initialisiert sein können, muss dies auch mit der Priorität beachtet werden, derzeit ist das nicht so
+
+    * Problem noch, wenn alle Activities mit Duration 0 sind, dann wird eine Endlosschleife ausgeführt (vielleicht max iteration einführen)
+    * Möglichkeit, keine Semaphoren zu haben einbauen
 
 MEDIUM-Priority:
 * wow, such empty
