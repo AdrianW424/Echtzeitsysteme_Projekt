@@ -31,7 +31,6 @@
     <div id="autoplay-settings" style="display: none">
         <div class="settings-item" id="autoplay-pause-div">Pause between frames in seconds: <input type="number" id="autoplay-pause" name="autoplay-pause" min="0.1" max="10" step="0.1" value="1"></div>
         <div class="settings-item" id="autoplay-stop">Stop after frames: <input type="number" id="autoplay-limit" name="autoplay-limit" min="1" max="999" step="1" value="20"></div>
-        <div class="settings-item" id="autoplay-abort"><a style="color: red; cursor: pointer"><u>Abort autoplay</u></a></div>
     </div>
     <div class="credit settings-item" style="color: rgb(166, 166, 166)">© Copyright 2023 <br> Adrian Waldera und Jannik Peplau</div>
 </div>
@@ -41,7 +40,7 @@
             <button class="btn btn-file" id="btn-file"><i class="fa fa-file"></i><br>Load CSV</button>
             <button class="btn btn-backward" id="btn-backward" disabled="true"><i class="fa fa-backward"></i><br>Backward</i></button>
             <button class="btn btn-forward" id="btn-forward" disabled="true"><i class="fa fa-forward"></i><br>Forward</button>
-            <button class="btn btn-autoplay" id="btn-autoplay" disabled="true" style="display: none"><i class="fa fa-play"></i><br>Autoplay</button>
+            <button class="btn btn-autoplay" id="btn-autoplay" disabled="true" style="display: none"><i id="playicon" class="fa fa-play"></i><br>Autoplay</button>
             <button class="btn btn-save" id="btn-save" disabled="true"><i class="fa fa-save"></i><br>Save Image</button>
             <button class="btn btn-settings" id="btn-settings" disabled="true"><i class="fa fa-cog"></i><br>Settings</button>
         </div>
@@ -248,8 +247,6 @@
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-off");
             document.getElementById("html").style.backgroundColor = "#eee";
             document.getElementById("html").style.color = "black";
-            // document.getElementById("pngviewer-div").style.border = "1px solid black";
-            // document.getElementById("editor-div").style.border = "1px solid black";
             document.getElementById("editor").style.color = "black";
             document.getElementById("settings-window").style.backgroundColor = "#ddd";
             document.getElementById("task-bar").style.backgroundColor = "#ccc";
@@ -264,8 +261,6 @@
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-on");
             document.getElementById("html").style.backgroundColor = "#111";
             document.getElementById("html").style.color = "white";
-            // document.getElementById("pngviewer-div").style.border = "1px solid white";
-            // document.getElementById("editor-div").style.border = "1px solid white";
             document.getElementById("editor").style.color = "white";
             document.getElementById("settings-window").style.backgroundColor = "#222";
             document.getElementById("task-bar").style.backgroundColor = "#333";
@@ -365,36 +360,36 @@
         }
     });
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    document.getElementById("btn-autoplay").addEventListener("click", async function() {
-        document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay", "Autoplay (Running)");
-        document.getElementById("btn-autoplay").disabled = true;
-        var btns = document.getElementsByClassName("btn");
-        for (var i = 0; i < btns.length; i++) {
-            btns[i].disabled = true;
-            btns[i].style.color = "#777";
-        }
-        for (var i = 0; i < document.getElementById("autoplay-limit").value; i++) {
-            fetch('/next')
-            .then(response => response.arrayBuffer())
-            .then(data => {
-                const blob = new Blob([data], { type: 'image/svg+xml' });
-                const url = URL.createObjectURL(blob);
-                document.getElementById('pngviewer').src = url;
-            });
-            if (i < document.getElementById("autoplay-limit").value-1) {
-                await sleep(document.getElementById("autoplay-pause").value*1000);
+    let intervalId;
+    async function autoGeneration() {
+        var i = 0;
+        intervalId = setInterval(() => {
+            if (i < document.getElementById("autoplay-limit").value) {
+                fetch('/next')
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const blob = new Blob([data], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById('pngviewer').src = url;
+                });
+                i++;
+            } else {
+                return;
             }
-        }
-        document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay (Running)", "Autoplay");
-        document.getElementById("btn-autoplay").disabled = false;
-        var btns = document.getElementsByClassName("btn");
-        for (var i = 0; i < btns.length; i++) {
-            btns[i].disabled = false;
-            if (darkmode == true) btns[i].style.color = "white";
-            else btns[i].style.color = "black";
+        }, document.getElementById("autoplay-pause").value*1000)
+    }
+    document.getElementById("btn-autoplay").addEventListener("click", function() {
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+            document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Stop Autoplay", "Autoplay");
+            document.getElementById("playicon").classList.remove("fa-pause");
+            document.getElementById("playicon").classList.add("fa-play");
+        } else {
+            document.getElementById("btn-autoplay").innerHTML = document.getElementById("btn-autoplay").innerHTML.replace("Autoplay", "Stop Autoplay");
+            document.getElementById("playicon").classList.remove("fa-play");
+            document.getElementById("playicon").classList.add("fa-pause");
+            autoGeneration();
         }
     });
 
