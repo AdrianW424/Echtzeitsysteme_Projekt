@@ -17,6 +17,8 @@ HIGH-Priority:
     * Problem noch, wenn alle Activities mit Duration 0 sind, dann wird eine Endlosschleife ausgeführt (vielleicht max iteration einführen)
     * Möglichkeit, keine Semaphoren zu haben einbauen
 
+    * InputChecker ist shit - scheiße (also wirklich)
+
 MEDIUM-Priority:
 * wow, such empty
 

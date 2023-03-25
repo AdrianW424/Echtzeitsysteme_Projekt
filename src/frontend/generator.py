@@ -1,7 +1,6 @@
 import pandas as pd
 import graphviz as gv
 import io
-from io import StringIO
 from PIL import Image, ImageOps
 import copy
 
@@ -222,12 +221,12 @@ def openFromCSV(content):
         
         if row["Activity_ID"] not in activities_IDs:
             activities_IDs.append(row["Activity_ID"])
-            activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], row["Predecessor_Semaphore_ID"], [], []))        
+            activities.append(Activity(row["Activity_ID"], row["Activity_Name"], row["Activity_Duration"], [], (lambda x: x if x != ['None'] else [])(row["Predecessor_Semaphore_ID"]), [], []))        
         # semaphoren anhand der VorgängerID erstellen, nicht anhand der herausgehenden ID
         for index, semaphore_ID in enumerate(row["Semaphore_ID"]):
             if semaphore_ID != "None" and semaphore_ID not in semaphore_IDs:
                 semaphore_IDs.append(semaphore_ID)
-                semaphores.append(Semaphore(semaphore_ID, row["Semaphore_Name"][index], [], int(row["Semaphore_Initial_Value"][index]), [], []))
+                semaphores.append(Semaphore(semaphore_ID, row["Semaphore_Name"][index], [], (lambda x: x if x != ['None'] else 0)(int(row["Semaphore_Initial_Value"][index])), [], []))
             
         for index, mutex_ID in enumerate(row["Mutex_ID"]):
             if mutex_ID != "None" and mutex_ID not in mutex_IDs:

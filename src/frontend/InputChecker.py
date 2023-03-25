@@ -15,8 +15,8 @@ class InputChecker():
         try:
             df = pd.read_csv(StringIO(input), sep=',')
             
-            for func in toApply:
-                func(df)
+            # for func in toApply:
+            #     func(df)
                 
         except InputException as ie:
             return False, ie.msg
@@ -44,12 +44,15 @@ class InputChecker():
         for columnType in self.columnTypes:
             if self.columnTypes[columnType] == 'int':
                 if not input[columnType].dtype == 'int64':
-                    raise InputException("The column '" + columnType + "' is not of the correct type. It should be of type 'int'.")
+                    if not (columnType == 'Semaphore_Initial_Value' and input[columnType][0] == 'None'):
+                        raise InputException("The column '" + columnType + "' is not of the correct type. It should be of type 'int'.")
             elif self.columnTypes[columnType] == 'int|list(int)':
                 if input[columnType].dtype != 'int64':
                     for row in input[columnType].str.split(';'):
                         for value in row:
                             try:
+                                if columnType == 'Semaphore_Initial_Value' and value == 'None':
+                                    continue
                                 int(value)
                             except:
                                 raise InputException("The column '" + columnType + "' is not of the correct type. It should be of type 'int' or 'list(int)'.")
