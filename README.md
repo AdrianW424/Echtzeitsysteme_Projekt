@@ -6,6 +6,7 @@
 ## TODO:
 HIGH-Priority:
 * Frontend:
+    * sobald Animation zuende, ist Button immer noch "Stop Autoplay", erst wenn man draufklickt ist wieder "Autoplay"
     * Angabe von der Dauer der GIF einbauen
     * InputChecker in Frontend integrieren (Fehlermeldungen, wenn falsche Daten eingegeben werden)
     * wenn mit CSV-Editor Falsches eingegeben wurde, dann lässt sich das Bild (obwohl nicht vorhanden) trotzdem downloaden und auch die Animationstasten funktionieren

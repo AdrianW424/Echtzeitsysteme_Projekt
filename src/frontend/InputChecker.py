@@ -28,6 +28,7 @@ class InputChecker():
     
     def checkColumns(self, input):
         # check if the columns are correct
+        input_columns = input.columns
         for column in self.columnTypes.keys():
             if column not in input_columns:
                 raise InputException("The column '" + column + "' is missing.")
