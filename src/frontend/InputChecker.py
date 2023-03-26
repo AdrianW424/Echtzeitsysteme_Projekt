@@ -21,8 +21,8 @@ class InputChecker():
         except InputException as ie:
             return False, ie.msg
         
-        # except Exception:
-        #     return False, "It seems like the data provided is not in CSV format."
+        except Exception:
+            return False, "It seems like the data provided is not in CSV format."
             
         return True, df
     
