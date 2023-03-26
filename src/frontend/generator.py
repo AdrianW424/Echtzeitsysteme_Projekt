@@ -179,7 +179,7 @@ def openFromCSV(content):
     # content for real use, Path for testing and development
     
     inputChecker = ic.InputChecker()
-    flag, res = inputChecker.checkInput(content, [inputChecker.checkColumns, inputChecker.checkEmptyCells, inputChecker.checkForUniqueIDs, inputChecker.checkColumnTypes, inputChecker.checkSemaphores]) 
+    flag, res = inputChecker.checkInput(content, [inputChecker.checkColumns, inputChecker.checkEmptyCells, inputChecker.checkForUniqueIDs, inputChecker.checkSemaphores]) 
     
     if not flag:
         return False, res

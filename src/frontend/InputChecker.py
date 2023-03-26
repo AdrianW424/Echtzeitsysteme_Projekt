@@ -6,7 +6,7 @@ class InputException(Exception):
         self.msg = msg
 
 class InputChecker():
-    columnTypes = {'Task_ID': 'str', 'Task_Name': 'str', 'Activity_ID': 'str', 'Activity_Name': 'str', 'Activity_Duration': 'int', 'Semaphore_ID': 'str|list(str)', 'Semaphore_Name': 'str|list(str)', 'Semaphore_Initial_Value': 'int|list(int)', 'Predecessor_Semaphore_ID': 'str|list(str)', 'Mutex_ID': 'str|list(str)', 'Mutex_Name': 'str|list(str)'}
+    columnTypes = {'Task_ID': True, 'Task_Name': True, 'Activity_ID': True, 'Activity_Name': True, 'Activity_Duration': False, 'Semaphore_ID': True, 'Semaphore_Name': True, 'Semaphore_Initial_Value': True, 'Predecessor_Semaphore_ID': True, 'Mutex_ID': True, 'Mutex_Name': True}
     
     # this method checks if the input is valid with various different other methods
     def checkInput(self, input, toApply=[]):
@@ -15,8 +15,8 @@ class InputChecker():
         try:
             df = pd.read_csv(StringIO(input), sep=',')
             
-            # for func in toApply:
-            #     func(df)
+            for func in toApply:
+                func(df)
                 
         except InputException as ie:
             return False, ie.msg
@@ -28,8 +28,6 @@ class InputChecker():
     
     def checkColumns(self, input):
         # check if the columns are correct
-
-        input_columns = input.columns
         for column in self.columnTypes.keys():
             if column not in input_columns:
                 raise InputException("The column '" + column + "' is missing.")
@@ -38,30 +36,30 @@ class InputChecker():
         
         if not input_columns.empty:
             raise InputException("The column '" + input_columns[0] + "' is not needed.")
-    
-    def checkColumnTypes(self, input):
-    
-        for columnType in self.columnTypes:
-            if self.columnTypes[columnType] == 'int':
-                if not input[columnType].dtype == 'int64':
-                    if not (columnType == 'Semaphore_Initial_Value' and input[columnType][0] == 'None'):
-                        raise InputException("The column '" + columnType + "' is not of the correct type. It should be of type 'int'.")
-            elif self.columnTypes[columnType] == 'int|list(int)':
-                if input[columnType].dtype != 'int64':
-                    for row in input[columnType].str.split(';'):
-                        for value in row:
-                            try:
-                                if columnType == 'Semaphore_Initial_Value' and value == 'None':
-                                    continue
-                                int(value)
-                            except:
-                                raise InputException("The column '" + columnType + "' is not of the correct type. It should be of type 'int' or 'list(int)'.")
-    
+        
     def checkEmptyCells(self, input):
         # check if there are empty cells
         for column in self.columnTypes.keys():
             if input[column].isnull().values.any():
                 raise InputException("There are empty cells in the column '" + column + "'. Try using 'None' instead.")
+    
+    def checkForUniqueIDs(self, input):
+        # check if the IDs are unique
+        for column in ['Activity_ID', 'Semaphore_ID', 'Predecessor_Semaphore_ID']:
+            if column == 'Predecessor_Semaphore_ID':
+                predecessorSemaphores = self.__getAllPredecessorSemaphoreIDs(input)
+                if len(predecessorSemaphores.unique()) != len(predecessorSemaphores):
+                    for i, row in enumerate(predecessorSemaphores.value_counts()):
+                        if row > 1:
+                            raise InputException(f"Looks like semaphore {predecessorSemaphores[i]} is used multiple times as predecessor. Check for column 'Predecessor_Semaphore_ID'.")
+            elif column == 'Semaphore_ID':
+                semaphores = self.__getAllSemaphoreIDs(input)
+                if len(semaphores.unique()) != len(semaphores):
+                    for i, row in enumerate(semaphores.value_counts()):
+                        if row > 1:
+                            raise InputException(f"Looks like semaphore {semaphores[i]} is used multiple times as successor. Check for column 'Semaphore_ID'.")
+            elif len(input[column].unique()) != len(input[column]):
+                raise InputException("The IDs in the column '" + column + "' are not unique.")
     
     def checkSemaphores(self, input):
         predecessorSemaphores = self.__getAllPredecessorSemaphoreIDs(input)
@@ -79,26 +77,35 @@ class InputChecker():
         for semaphore in outgoingSemaphores:
             if semaphore not in predecessorSemaphores.values:
                 raise InputException("The semaphore '" + semaphore + "' has nowhere to go.")
-        
-    def checkForUniqueIDs(self, input):
-        # check if the IDs are unique
-        for column in ['Activity_ID', 'Semaphore_ID', 'Predecessor_Semaphore_ID']:
-            if column == 'Predecessor_Semaphore_ID':
-                predecessorSemaphores = self.__getAllPredecessorSemaphoreIDs(input)
-                if len(predecessorSemaphores.unique()) != len(predecessorSemaphores):
-                    raise InputException("Looks like some semaphores are used multiple times as predecessors. Check for column 'Predecessor_Semaphore_ID'.")
-            elif column == 'Semaphore_ID':
-                semaphores = self.__getAllSemaphoreIDs(input)
-                if len(semaphores.unique()) != len(semaphores):
-                    raise InputException("Looks like some semaphores are used multiple times as successors. Check for column 'Semaphore_ID'.")
-            elif len(input[column].unique()) != len(input[column]):
-                raise InputException("The IDs in the column '" + column + "' are not unique.")
-            
-    def test(self, input):
+    
+    def checkColumnValues(self, input):
+        # check if the column types are correct
+        for column in self.columnTypes.keys():
+            if self.columnTypes[column] == False:
+                for row in input[column]:
+                    if row == 'None':
+                        raise InputException("The column '" + column + "' should be of type 'integer'.")
+                    
+                    if column == 'Activity_Duration':
+                        if not isinstance(row, int):
+                            raise InputException("The column '" + column + "' should be of type 'integer'.")
+                        elif row < 0:
+                            raise InputException("The column '" + column + "' should be positive.")
+    
+    def testPre(self, input):
         return self.__getAllPredecessorSemaphoreIDs(input)
     
+    def test(self, input):
+        return self.__getAllSemaphoreIDs(input)
+    
     def __getAllSemaphoreIDs(self, input):
-        return input['Semaphore_ID'].str.split(';').apply(pd.Series).stack().reset_index(drop=True)
+        if input['Semaphore_ID'].dtype == 'int64':
+            return input['Semaphore_ID'].loc[input['Semaphore_ID'] != 'None'].astype(str)
+        buf = input['Semaphore_ID'].str.split(';').apply(pd.Series).stack().reset_index(drop=True)
+        return buf.loc[buf != 'None']
     
     def __getAllPredecessorSemaphoreIDs(self, input):
-        return input['Predecessor_Semaphore_ID'].str.split(';').apply(pd.Series).stack().reset_index(drop=True).apply(lambda x: x[1:-1] if x[0] == '[' and x[-1] == ']' else (x[1:] if x[0] == '[' else (x[:-1] if x[-1] == ']' else x)))
+        if input['Predecessor_Semaphore_ID'].dtype == 'int64':
+            return input['Predecessor_Semaphore_ID'].loc[input['Predecessor_Semaphore_ID'] != 'None'].astype(str)
+        buf = input['Predecessor_Semaphore_ID'].str.split(';').apply(pd.Series).stack().reset_index(drop=True).apply(lambda x: x[1:-1] if x[0] == '[' and x[-1] == ']' else (x[1:] if x[0] == '[' else (x[:-1] if x[-1] == ']' else x)))
+        return buf.loc[buf != 'None']

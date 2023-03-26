@@ -14,8 +14,9 @@ HIGH-Priority:
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
 
     * InputChecker ist shit - scheiße (also wirklich)
-
-    * Initialwert der Semaphoren ändern - direkt an Semaphore übergeben
+        * auf None-Werte achten
+        * Initialwert darf nicht unter 0 sein
+        * Duration darf nicht unter 0 sein
 
 MEDIUM-Priority:
 * wow, such empty
