@@ -36,8 +36,6 @@ class Activity:
     def runActivity(self):
         if self.currentDuration == self.duration:
             self.releaseSemaphores()
-            for semaphore in self.semaphoresIN:
-                semaphore.checkSemaphore()
     
         if self.currentDuration > 0:
             self.currentValue = 1
@@ -124,13 +122,6 @@ class Semaphore:
         self.activityIN = activityIN
         self.activityOUT = activityOUT
         self.currentValue = 0
-        
-    def checkSemaphore(self):
-        if self.currentValue <= 0 and self.initialValue > 0:
-            self.currentValue += 1
-            self.initialValue -= 1
-            return True
-        return False
         
 class StorageObject:
     length = 0
@@ -434,7 +425,8 @@ def getNextFrameNew():
         startPoints = getAllStartPoints()
     
         for startPoint in startPoints:
-            startPoint.checkSemaphore()
+            startPoint.currentValue = startPoint.initialValue
+            startPoint.initialValue = 0
             listOfActivities.append(startPoint.activityIN)
         listOfActivities = sorted(listOfActivities, key=lambda activity: activity.ID)
         
