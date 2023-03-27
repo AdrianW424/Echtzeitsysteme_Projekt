@@ -13,20 +13,14 @@ HIGH-Priority:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
 
-    * InputChecker ist shit - scheiße (also wirklich)
-        * auf None-Werte achten
-        * Initialwert darf nicht unter 0 sein
-        * Duration darf nicht unter 0 sein
-
 MEDIUM-Priority:
 * wow, such empty
 
 LOW-Priority:
-* Backend:
-    * Programm verschönern - bessere Verteilung der Objekte
+* wow, such empty
 
 ## TOTEST:
-* Mehrere Semaphoren mit unterschiedlichen Initialwert
-* Activity mit Duration 0
-* Mutex mehrere
-* Mutexs unterschiedlichen Tasks zugeordnet, nicht immer den beiden gleichen Activities
+* Mehrere Semaphoren mit unterschiedlichen Initialwert                                      - passed
+* Activity mit Duration 0                                                                   - passed
+* Mutex mehrere                                                                             - passed
+* Mutexs unterschiedlichen Tasks zugeordnet, nicht immer den beiden gleichen Activities     - passed
