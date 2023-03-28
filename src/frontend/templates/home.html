@@ -15,7 +15,8 @@
             <hr>
             <h3>CSV Editor</h3>
             <textarea name="editor" type="text" class="editor" id="editor"></textarea>
-            <button id="editor-apply" class="btn editor-apply">Apply changes</button>
+            <div class="editor-table" id="editor-table"></div>
+            <button id="editor-apply" class="btn editor-apply">Edit CSV Data</button>
         </div>
     </center>
 </body>
@@ -162,12 +163,12 @@
     function load() {
         var btns = document.getElementsByClassName("btn");
         for (var i = 0; i < btns.length; i++) {
-            btns[i].addEventListener('mouseover', function() {
+            btns[i].addEventListener("mouseover", function() {
                 this.style.backgroundColor = "#7d7d7d";
             });
         }
         for (var i = 0; i < btns.length; i++) {
-            btns[i].addEventListener('mouseout', function() {
+            btns[i].addEventListener("mouseout", function() {
                 if (darkmode == true) {
                     this.style.backgroundColor = "#222";
                 } else {
@@ -177,10 +178,10 @@
         }
     }
 
-    document.getElementById("btn-file").addEventListener('click', function () {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.addEventListener('change', () => {
+    document.getElementById("btn-file").addEventListener("click", function () {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.addEventListener("change", () => {
             const file = input.files[0];
             if (input.files.length > 1) {
                 alert("Please select only one file");
@@ -191,59 +192,60 @@
                 return;
             }
             const formData = new FormData();
-            formData.append('file', file);
-            fetch('/process_file', {
-                method: 'POST',
+            formData.append("file", file);
+            fetch("/process_file", {
+                method: "POST",
                 body: formData
             })
             .then(response => response.arrayBuffer())
             .then(data => {
-                const blob = new Blob([data], { type: 'image/svg+xml' });
+                const blob = new Blob([data], { type: "image/svg+xml" });
                 const url = URL.createObjectURL(blob);
                 document.getElementById("editor").value = "";
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const originalValue = document.getElementById('editor').value;
+                    const originalValue = document.getElementById("editor").value;
                     document.getElementById("btn-backward").disabled = false;
                     document.getElementById("btn-forward").disabled = false;
                     document.getElementById("btn-autoplay").disabled = false;
                     document.getElementById("btn-save").disabled = false;
                     document.getElementById("btn-settings").disabled = false;
                     const fileContents = e.target.result;
-                    document.getElementById('editor').value = originalValue + "\n" + fileContents;
-                    document.getElementById('editor').style.height = document.getElementById('editor').scrollHeight + 'px';
+                    document.getElementById("editor").value = originalValue + "\n" + fileContents;
+                    document.getElementById("editor").style.height = document.getElementById("editor").scrollHeight + "px";
                 }
                 reader.readAsText(file);
-                document.getElementById('pngviewer').src = url;
-                document.getElementById('pngviewer-div').style.display = 'block';
-                document.getElementById('nocontent-warning').style.display = 'none';
-                document.getElementById('editor-div').style.display = 'block';
+                document.getElementById("pngviewer").src = url;
+                document.getElementById("pngviewer-div").style.display = "block";
+                document.getElementById("nocontent-warning").style.display = "none";
+                document.getElementById("editor-div").style.display = "block";
+                createTable();
             });
         });
         input.click();
     });
 
-    document.getElementById("btn-backward").addEventListener('click', function() {
-        fetch('/prev')
+    document.getElementById("btn-backward").addEventListener("click", function() {
+        fetch("/prev")
             .then(response => response.arrayBuffer())
             .then(data => {
-                const blob = new Blob([data], { type: 'image/svg+xml' });
+                const blob = new Blob([data], { type: "image/svg+xml" });
                 const url = URL.createObjectURL(blob);
-                document.getElementById('pngviewer').src = url;
+                document.getElementById("pngviewer").src = url;
             });
     });
 
-    document.getElementById("btn-forward").addEventListener('click', function() {
-        fetch('/next')
+    document.getElementById("btn-forward").addEventListener("click", function() {
+        fetch("/next")
             .then(response => response.arrayBuffer())
             .then(data => {
-                const blob = new Blob([data], { type: 'image/svg+xml' });
+                const blob = new Blob([data], { type: "image/svg+xml" });
                 const url = URL.createObjectURL(blob);
-                document.getElementById('pngviewer').src = url;
+                document.getElementById("pngviewer").src = url;
             });
     });
 
-    document.getElementById("darkmode-toggle").addEventListener('click', function() {
+    document.getElementById("darkmode-toggle").addEventListener("click", function() {
         if (darkmode == true) {
             darkmode = false;
             document.getElementById("darkmode-toggle").classList.remove("fa-toggle-on");
@@ -255,8 +257,8 @@
             document.getElementById("task-bar").style.backgroundColor = "#ccc";
             var btns = document.getElementsByClassName("btn");
             for (var i = 0; i < btns.length; i++) {
-                btns[i].style.backgroundColor = '#ddd';
-                btns[i].style.color = 'black';
+                btns[i].style.backgroundColor = "#ddd";
+                btns[i].style.color = "black";
             }
         } else {
             darkmode = true;
@@ -269,14 +271,14 @@
             document.getElementById("task-bar").style.backgroundColor = "#333";
             var btns = document.getElementsByClassName("btn");
             for (var i = 0; i < btns.length; i++) {
-                btns[i].style.backgroundColor = '#222'; 
-                btns[i].style.color = 'white';
+                btns[i].style.backgroundColor = "#222"; 
+                btns[i].style.color = "white";
             }
             
         }
-        fetch('/darkmode_toggle', {
-            method: 'POST',
-            body: JSON.stringify({'darkmode': darkmode}),
+        fetch("/darkmode_toggle", {
+            method: "POST",
+            body: JSON.stringify({"darkmode": darkmode}),
             cache: "no-cache",
             headers: new Headers({
             "content-type": "application/json"
@@ -284,13 +286,13 @@
         })
         .then(response => response.arrayBuffer())
         .then(data => {
-            const blob = new Blob([data], { type: 'image/svg+xml' });
+            const blob = new Blob([data], { type: "image/svg+xml" });
             const url = URL.createObjectURL(blob);
-            document.getElementById('pngviewer').src = url;
+            document.getElementById("pngviewer").src = url;
         });
     });
 
-    document.getElementById("btn-settings").addEventListener('click', function() {
+    document.getElementById("btn-settings").addEventListener("click", function() {
         if (document.getElementById("settings-window").style.display == "block") {
             document.getElementById("settings-window").style.display = "none";
             document.getElementById("body").style.width = "100%";
@@ -303,7 +305,7 @@
     });
 
     var autoplay = false
-    document.getElementById("autoplay-toggle").addEventListener('click', function() {
+    document.getElementById("autoplay-toggle").addEventListener("click", function() {
         if (autoplay == false) {
             autoplay = true;
             document.getElementById("autoplay-toggle").classList.remove("fa-toggle-off");
@@ -324,7 +326,7 @@
     });
 
     var gifsave = false
-    document.getElementById("gifsave-toggle").addEventListener('click', function() {
+    document.getElementById("gifsave-toggle").addEventListener("click", function() {
         if (gifsave == false) {
             gifsave = true;
             document.getElementById("gifsave-toggle").classList.remove("fa-toggle-off");
@@ -343,16 +345,16 @@
     document.getElementById("btn-save").addEventListener("click", function() {
         if (gifsave == false) {
             var url = document.getElementById("pngviewer").src;
-            var link = document.createElement('a');
+            var link = document.createElement("a");
             link.href = url;
             link.download = "export.svg";
             link.click();
         } else {
-            fetch('/savegif')
+            fetch("/savegif")
             .then(response => response.blob())
             .then(blob => {
                 const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const link = document.createElement("a");
                 link.download = "export.gif";
                 link.href = url;
                 link.style.display = "none";
@@ -370,12 +372,12 @@
         var i = 0;
         intervalId = setInterval(() => {
             if (i < document.getElementById("autoplay-limit").value) {
-                fetch('/next')
+                fetch("/next")
                 .then(response => response.arrayBuffer())
                 .then(data => {
-                    const blob = new Blob([data], { type: 'image/svg+xml' });
+                    const blob = new Blob([data], { type: "image/svg+xml" });
                     const url = URL.createObjectURL(blob);
-                    document.getElementById('pngviewer').src = url;
+                    document.getElementById("pngviewer").src = url;
                 });
                 i++;
             } else {
@@ -399,24 +401,62 @@
         }
     });
 
+    var editing = false;
     document.getElementById("editor-apply").addEventListener("click", function() {
-        var fileblob = new Blob([document.getElementById("editor").value], { type: "text/plain;charset=utf-8" });
-        const formData = new FormData();
-        formData.append('file', fileblob);
-        fetch('/process_file', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.arrayBuffer())
-        .then(data => {
-            const blob = new Blob([data], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            document.getElementById('pngviewer').src = url;
-        });
+        if (editing == false) {
+            editing = true;
+            document.getElementById("editor").style.display = "block";
+            document.getElementById("editor-table").style.display = "none";
+            document.getElementById("editor-apply").innerHTML = document.getElementById("editor-apply").innerHTML.replace("Edit CSV Data", "Apply changes");
+        } else {
+            editing = false;
+            document.getElementById("editor").style.display = "none";
+            document.getElementById("editor-table").style.display = "block";
+            createTable();
+            document.getElementById("editor-apply").innerHTML = document.getElementById("editor-apply").innerHTML.replace("Apply changes", "Edit CSV Data");
+            var fileblob = new Blob([document.getElementById("editor").value], { type: "text/plain;charset=utf-8" });
+            const formData = new FormData();
+            formData.append("file", fileblob);
+            fetch("/process_file", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const blob = new Blob([data], { type: "image/svg+xml" });
+                const url = URL.createObjectURL(blob);
+                document.getElementById("pngviewer").src = url;
+            });
+        }
     });
 
-    document.getElementById("editor").addEventListener("input", function() {
-        this.height = "fit-content";
-    });
+    function createTable() { // Helper function
+        var csvContent = document.getElementById("editor").value;
+        var rows = csvContent.split("\n");
+        var table = document.createElement("table");
+        var headerRow = document.createElement("tr");
+        var headerCells = rows[0].split(",");
+        for (var i = 0; i < headerCells.length; i++) {
+            var headerCell = document.createElement("th");
+            headerCell.textContent = headerCells[i];
+            headerRow.appendChild(headerCell);
+        }
+        table.appendChild(headerRow);
+
+        for (var j = 1; j < rows.length; j++) {
+            var dataRow = document.createElement("tr");
+            var dataCells = rows[j].split(",");
+            for (var k = 0; k < dataCells.length; k++) {
+                var dataCell = document.createElement("td");
+                dataCell.textContent = dataCells[k];
+                dataRow.appendChild(dataCell);
+            }
+            table.appendChild(dataRow);
+        }
+
+        var tableContainer = document.getElementById("editor-table");
+        tableContainer.innerHTML = "";
+        tableContainer.appendChild(table);
+    }
 
 </script>
