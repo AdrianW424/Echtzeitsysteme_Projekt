@@ -1,8 +1,8 @@
 Task_ID,Task_Name,Activity_ID,Activity_Name,Activity_Duration,Semaphore_ID,Semaphore_Name,Semaphore_Initial_Value,Predecessor_Semaphore_ID,Mutex_ID,Mutex_Name
-1,Task1,1,Activity1,1,12;13;16,Semaphore12;Semaphore13;Semaphore16,0;0;0,51,None,None
-2,Task2,2,Activity2,1,24,Semaphore24,0,12,234,Mutex234
-3,Task3,3,Activity3,1,36,Semaphore36,0,13,234,Mutex234
-4,Task4,4,Activity4,1,46,Semaphore46,0,24,234,Mutex234
-5,Task5,5,Activity5a,1,55,Semaphore55,0,56;65,None,None
-5,Task5,7,Activity5b,1,51;56,Semaphore51;Semaphore56,1;7,55,None,None
-6,Task6,6,Activity6,1,65,Semaphore65,0,[36;46;16],None,None
+1,T1,1,A1,1,12;13;16,s12;s13;s16,0;0;0,51,None,None
+2,T2,2,A2,1,24,s24,0,12,234,m234
+3,T3,3,A3,1,36,s36,0,13,234,m234
+4,T4,4,A4,1,46,s46,0,24,234,m234
+5,T5,5,A5a,1,55,s55,0,56;65,None,None
+5,T5,7,A5b,1,51;56,s51;s56,1;7,55,None,None
+6,T6,6,A6,1,65,s65,0,[36;46;16],None,None
