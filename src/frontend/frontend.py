@@ -30,10 +30,13 @@ def loadCSVFile():
                 return generator.getSingleImage(color, inverseColor, step=0)
     return "Error", 400
 
-@app.route("/savegif")
+@app.route("/savegif", methods=['POST'])
 def saveGif():
-    ###### TODO: Maybe set the duration of the gif ######
-    return generator.createGIF(color, inverseColor, 0, 0, 1000)
+    # Pass on an argument to the function to determine how long the gif should be
+    if request.method == 'POST':
+        data = request.get_json()
+        print(type(data['duration']))
+        return generator.createGIF(color, inverseColor, 0, 0, float(data['duration'])*1000)
 
 @app.route("/darkmode_toggle", methods=['POST'])
 def darkmodeToggle():
