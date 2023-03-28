@@ -126,9 +126,19 @@
         margin-top: 10px;
         margin-bottom: 10px;
     }
+    .editor-div div {
+        width: 95%;
+        height: auto;
+        border: none;
+        font-size: 16px;
+        font-family: arial;
+        background-color: transparent;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
     .editor-div button {
         margin-top: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 20px; 
     }
     
     .settings-window {
@@ -213,13 +223,15 @@
                     const fileContents = e.target.result;
                     document.getElementById("editor").value = originalValue + "\n" + fileContents;
                     document.getElementById("editor").style.height = document.getElementById("editor").scrollHeight + "px";
+                    createTable();
+                    document.getElementById("editor").style.display = "none";
+                    document.getElementById("editor-table").style.display = "block";
                 }
                 reader.readAsText(file);
                 document.getElementById("pngviewer").src = url;
-                document.getElementById("pngviewer-div").style.display = "block";
                 document.getElementById("nocontent-warning").style.display = "none";
+                document.getElementById("pngviewer-div").style.display = "block";
                 document.getElementById("editor-div").style.display = "block";
-                createTable();
             });
         });
         input.click();
