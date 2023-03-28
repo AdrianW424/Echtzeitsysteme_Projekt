@@ -12,6 +12,7 @@ HIGH-Priority:
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
+    * bei Veroderung in gleichem Task - Pfeilspitze darf nicht ausgefüllt sein
 
 MEDIUM-Priority:
 * wow, such empty
