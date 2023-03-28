@@ -360,7 +360,15 @@ def createSemaphores(color, inverseColor, storedObjects):
             
             # after the groupSemaphores
             colorOfLastSemaphore = color
+            
+            task = False
+            if semaphore.activityOUT.parentTask.ID == semaphore.activityIN.parentTask.ID:
+                task = semaphore.activityOUT.parentTask.ID
+            
             for groupSemaphore in semaphore.groupWith:
+                if task != groupSemaphore.activityOUT.parentTask.ID:
+                    task = False
+                
                 if groupSemaphore.currentValue > 0:
                     color = SEMAPHORE_ACTIVE
                     colorOfLastSemaphore = SEMAPHORE_ACTIVE
@@ -384,7 +392,12 @@ def createSemaphores(color, inverseColor, storedObjects):
                 semaphores_buf.remove(groupSemaphore)
                 
             dot.node(middleDummyName, shape='point', width="0.01", height="0.01", color=colorOfLastSemaphore)
-            dot.edge(middleDummyName, "Activity"+str(semaphore.activityIN.ID), arrowhead='normal', splines='polyline', color=colorOfLastSemaphore)
+            
+            # distinguish between semaphores that lead to the same task and those that lead to another task
+            if task == False:
+                dot.edge(middleDummyName, "Activity"+str(semaphore.activityIN.ID), arrowhead='normal', splines='polyline', color=colorOfLastSemaphore)
+            else:
+                dot.edge(middleDummyName, "Activity"+str(semaphore.activityIN.ID), arrowhead='onormal', splines='polyline', color=colorOfLastSemaphore)
             
         else:
             # if semaphore is leading to the same task where it came from, use another arrowhead
