@@ -266,6 +266,7 @@
     document.getElementById("darkmode-toggle").addEventListener("click", function() {
         if (darkmode == true) {
             darkmode = false;
+            createTable();
             document.getElementById("darkmode-toggle").classList.remove("fa-toggle-on");
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-off");
             document.getElementById("html").style.backgroundColor = "#eee";
@@ -280,6 +281,7 @@
             }
         } else {
             darkmode = true;
+            createTable();
             document.getElementById("darkmode-toggle").classList.remove("fa-toggle-off");
             document.getElementById("darkmode-toggle").classList.add("fa-toggle-on");
             document.getElementById("html").style.backgroundColor = "#111";
@@ -292,7 +294,6 @@
                 btns[i].style.backgroundColor = "#222"; 
                 btns[i].style.color = "white";
             }
-            
         }
         fetch("/darkmode_toggle", {
             method: "POST",
@@ -463,26 +464,40 @@
         }
         table.appendChild(headerRow);
 
-        for (var j = 1; j < rows.length; j++) {
+        for (var j = 1; j < rows.length-1; j++) {
             var dataRow = document.createElement("tr");
             var dataCells = rows[j].split(",");
             for (var k = 0; k < dataCells.length; k++) {
                 var dataCell = document.createElement("td");
                 dataCell.textContent = dataCells[k];
+                dataCell.innerHTML = dataCell.innerHTML.replace("_", "<br>").replace("_", "<br>");
                 dataRow.appendChild(dataCell);
             }
             table.appendChild(dataRow);
-            dataRow.style.border = "1px solid black"; // Add border to tr element
+            if (darkmode == false) {
+                dataRow.style.border = "1px solid black";
+            } else {
+                dataRow.style.border = "1px solid white";
+            }
         }
 
         var thCells = headerRow.getElementsByTagName("th");
-        for (var l = 0; l < thCells.length; l++) {
-            thCells[l].style.border = "1px solid black"; // Add border to th elements
+        for (var l = 1; l < thCells.length; l++) {
+            
+            if (darkmode == false) {
+                thCells[l].style.border = "1px solid black";
+            } else {
+                thCells[l].style.border = "1px solid white";
+            }
         }
 
         var tdCells = table.getElementsByTagName("td");
         for (var m = 0; m < tdCells.length; m++) {
-            tdCells[m].style.border = "1px solid black"; // Add border to td elements
+            if (darkmode == false) {
+                tdCells[m].style.border = "1px solid black";
+            } else {
+                tdCells[m].style.border = "1px solid white";
+            }
         }
 
 
