@@ -24,6 +24,7 @@ def loadCSVFile():
             res = generator.openFromCSV(content)
             if res[0] == False:
                 # TODO: Show error message and disable buttons
+                print("FEHLER: " + res[1])
                 return res[1]
             else:
                 return generator.getSingleImage(color, inverseColor, step=0)
