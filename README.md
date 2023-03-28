@@ -9,8 +9,6 @@ HIGH-Priority:
     * Angabe von der Dauer der GIF einbauen
     * InputChecker in Frontend integrieren (Fehlermeldungen, wenn falsche Daten eingegeben werden)
     * wenn mit CSV-Editor Falsches eingegeben wurde, dann lässt sich das Bild (obwohl nicht vorhanden) trotzdem downloaden und auch die Animationstasten funktionieren
-    * Tabelle - erte Spalte ganz oben leere Zelle, letzte Zeile leer
-    * Tabelle - darkmode
 * Backend:
     * Animationsalgorithmus entwickeln und implementieren - 95% fertig (genauere Tests durchführen)
         * keine genauen Probleme bekannt. Zu testen siehe TOTEST unten
@@ -22,7 +20,7 @@ LOW-Priority:
 * wow, such empty
 
 ## TOTEST:
-* Mehrere Semaphoren mit unterschiedlichen Initialwert                                      - passed
+* Mehrere Semaphoren mit unterschiedlichem Initialwert                                      - passed
 * Activity mit Duration 0                                                                   - passed
 * Mutex mehrere                                                                             - passed
 * Mutexs unterschiedlichen Tasks zugeordnet, nicht immer den beiden gleichen Activities     - passed
