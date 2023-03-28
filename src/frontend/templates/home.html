@@ -450,8 +450,7 @@
     });
 
     function createTable() { // Helper function
-        var csvContent = document.getElementById("editor").value;
-        var csvContent = document.getElementById("editor").value;
+        var csvContent = document.getElementById("editor").value.replace(/^\s+|\s+$/g, '');
         var rows = csvContent.split("\n");
         var table = document.createElement("table");
         table.style.borderCollapse = "collapse";
@@ -460,6 +459,7 @@
         for (var i = 0; i < headerCells.length; i++) {
             var headerCell = document.createElement("th");
             headerCell.textContent = headerCells[i];
+            headerCell.innerHTML = headerCell.innerHTML.replace("_", "<br>").replace("_", "<br>");
             headerRow.appendChild(headerCell);
         }
         table.appendChild(headerRow);
@@ -470,7 +470,6 @@
             for (var k = 0; k < dataCells.length; k++) {
                 var dataCell = document.createElement("td");
                 dataCell.textContent = dataCells[k];
-                dataCell.innerHTML = dataCell.innerHTML.replace("_", "<br>").replace("_", "<br>");
                 dataCell.style.margin = "10px";
                 dataRow.appendChild(dataCell);
             }
@@ -483,7 +482,7 @@
         }
 
         var thCells = headerRow.getElementsByTagName("th");
-        for (var l = 1; l < thCells.length; l++) {
+        for (var l = 0; l < thCells.length; l++) {
             
             if (darkmode == false) {
                 thCells[l].style.border = "1px solid black";
