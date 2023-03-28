@@ -464,13 +464,14 @@
         }
         table.appendChild(headerRow);
 
-        for (var j = 1; j < rows.length-1; j++) {
+        for (var j = 1; j < rows.length; j++) {
             var dataRow = document.createElement("tr");
             var dataCells = rows[j].split(",");
             for (var k = 0; k < dataCells.length; k++) {
                 var dataCell = document.createElement("td");
                 dataCell.textContent = dataCells[k];
                 dataCell.innerHTML = dataCell.innerHTML.replace("_", "<br>").replace("_", "<br>");
+                dataCell.style.margin = "10px";
                 dataRow.appendChild(dataCell);
             }
             table.appendChild(dataRow);
