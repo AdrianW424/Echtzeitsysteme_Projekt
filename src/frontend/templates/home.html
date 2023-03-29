@@ -223,6 +223,13 @@
                     document.getElementById("nocontent-warning").style.display = "none";
                     document.getElementById("file-error-content").innerHTML = data;
                     document.getElementById("file-error").style.display = "block";
+                    document.getElementById("pngviewer-div").style.display = "none";
+                    document.getElementById("editor-div").style.display = "none";
+                    document.getElementById("btn-backward").disabled = true;
+                    document.getElementById("btn-forward").disabled = true;
+                    document.getElementById("btn-autoplay").disabled = true;
+                    document.getElementById("btn-save").disabled = true;
+                    document.getElementById("btn-settings").disabled = true;
                     return;
                 } else {
                     fetch("/process_file", {
