@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ def createNextImage():
 def getPrevImage():
     return generator.getSingleImage(color, inverseColor, step=-1)
 
-@app.route("/process_file", methods=['POST'])
+@app.route("/process_file", methods=['GET', 'POST'])
 def loadCSVFile():
     if request.method == 'POST':
         file = request.files['file']
@@ -23,9 +23,7 @@ def loadCSVFile():
             content = file.read().decode('utf-8')
             res = generator.openFromCSV(content)
             if res[0] == False:
-                # TODO: Show error message and disable buttons
-                print("FEHLER: " + res[1])
-                return res[1]
+                return(res[1])
             else:
                 return generator.getSingleImage(color, inverseColor, step=0)
     return "Error", 400

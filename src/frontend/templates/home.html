@@ -11,6 +11,8 @@
             <h3>CSV Editor</h3>
             <textarea name="editor" type="text" class="editor" id="editor"></textarea>
             <div class="editor-table" id="editor-table"></div>
+            <i class="fa fa-exclamation-triangle" style="color: orange"></i><a style="color: orange"> Changes made through the editor are not validated and may cause errors.</a>
+            <br>
             <button id="editor-apply" class="btn editor-apply"><i id="editor-icon" class="fa fa-pencil"></i><br>Edit CSV Data</button>
             <hr>
         </div>
@@ -26,6 +28,8 @@
     <h3 style="margin-left: 20px">General</h3>
     <div class="settings-item"><i id="darkmode-toggle" class="fa fa-toggle-off"></i> Darkmode</div>
     <div class="settings-item"><i id="editor-toggle" class="fa fa-toggle-off"></i> CSV Editor</div>
+    <hr>
+    <h3 style="margin-left: 20px">Image Download</h3>
     <div class="settings-item"><i id="gifsave-toggle" class="fa fa-toggle-off"></i> Save Image as GIF</div>
     <div id="gifsave-settings" style="display: none">
         <div class="settings-item">Pause inbetween frames: <input type="number" id="gifsave-duration" name="gifsave-duration" min="0.1" max="2" step="0.1" value="0.5"></div>
@@ -37,11 +41,6 @@
         <div class="settings-item" id="autoplay-pause-div">Pause between frames in seconds: <input type="number" id="autoplay-pause" name="autoplay-pause" min="0.1" max="10" step="0.1" value="1"></div>
         <div class="settings-item" id="autoplay-stop">Stop after frames: <input type="number" id="autoplay-limit" name="autoplay-limit" min="1" max="999" step="1" value="20"></div>
     </div>
-    <hr>
-    <h3 style="margin-left: 20px">Help</h3>
-    <div class="settings-item"><a>General Usage Instructinos</a></div>
-    <div class="settings-item"><a>CSV Formatting Guide</a></div>
-
     <div class="credit settings-item" style="color: rgb(166, 166, 166)">© Copyright 2023 <br> Adrian Waldera (5932553) <br> Jannik Peplau (1995581)</div>
 </div>
 <footer>
