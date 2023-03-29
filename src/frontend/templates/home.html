@@ -6,12 +6,13 @@
 </head>
 <body id="body" onload="load()">
     <center>
-        <h4 id="nocontent-warning"><i class="fa fa-exclamation" style="color: red; margin-top: 40vh"></i> No data loaded, use Load button to import CSV <i class="fa fa-exclamation" style="color: red"></i></h4>
+        <h4 id="nocontent-warning" style="margin-top: 40vh"></i> No data provided, use "Load CSV" button to import data from a CSV file.</h4>
+        <div id="file-error" style="margin-top: 40vh; display: none"><h4 style="color: red" id="file-error-content"></h4></div>
         <div class="editor-div" id="editor-div" style="display: none">
             <h3>CSV Editor</h3>
             <textarea name="editor" type="text" class="editor" id="editor"></textarea>
             <div class="editor-table" id="editor-table"></div>
-            <i class="fa fa-exclamation-triangle" style="color: orange"></i><a style="color: orange"> Changes made through the editor are not validated and may cause errors.</a>
+            <div id="editor-error" style="display: none"><i class="fa fa-exclamation-triangle" style="color: orange"></i><a style="color: orange" id="editor-error-content"></a></div>
             <br>
             <button id="editor-apply" class="btn editor-apply"><i id="editor-icon" class="fa fa-pencil"></i><br>Edit CSV Data</button>
             <hr>
@@ -197,11 +198,15 @@
         input.addEventListener("change", () => {
             const file = input.files[0];
             if (input.files.length > 1) {
-                alert("Please select only one file");
+                document.getElementById("nocontent-warning").style.display = "none";
+                document.getElementById("file-error-content").innerHTML = "Please select only one file";
+                document.getElementById("file-error").style.display = "block";
                 return;
             }
             if (!file.name.endsWith(".csv")) {
-                alert("Please select a CSV file");
+                document.getElementById("nocontent-warning").style.display = "none";
+                document.getElementById("file-error-content").innerHTML = "Please select a CSV file";
+                document.getElementById("file-error").style.display = "block";
                 return;
             }
             const formData = new FormData();
@@ -210,30 +215,49 @@
                 method: "POST",
                 body: formData
             })
-            .then(response => response.arrayBuffer())
+            .then(response => {
+                return response.text();
+            })
             .then(data => {
-                const blob = new Blob([data], { type: "image/svg+xml" });
-                const url = URL.createObjectURL(blob);
-                document.getElementById("editor").value = "";
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const originalValue = document.getElementById("editor").value;
-                    document.getElementById("btn-backward").disabled = false;
-                    document.getElementById("btn-forward").disabled = false;
-                    document.getElementById("btn-autoplay").disabled = false;
-                    document.getElementById("btn-save").disabled = false;
-                    document.getElementById("btn-settings").disabled = false;
-                    const fileContents = e.target.result;
-                    document.getElementById("editor").value = originalValue + "\n" + fileContents;
-                    document.getElementById("editor").style.height = document.getElementById("editor").scrollHeight + "px";
-                    createTable();
-                    document.getElementById("editor").style.display = "none";
-                    document.getElementById("editor-table").style.display = "block";
+                if (data.startsWith("<?xml") == false) {
+                    document.getElementById("nocontent-warning").style.display = "none";
+                    document.getElementById("file-error-content").innerHTML = data;
+                    document.getElementById("file-error").style.display = "block";
+                    return;
+                } else {
+                    fetch("/process_file", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => {
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        const blob = new Blob([data], { type: "image/svg+xml" });
+                        const url = URL.createObjectURL(blob);
+                        document.getElementById("editor").value = "";
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const originalValue = document.getElementById("editor").value;
+                            document.getElementById("btn-backward").disabled = false;
+                            document.getElementById("btn-forward").disabled = false;
+                            document.getElementById("btn-autoplay").disabled = false;
+                            document.getElementById("btn-save").disabled = false;
+                            document.getElementById("btn-settings").disabled = false;
+                            const fileContents = e.target.result;
+                            document.getElementById("editor").value = originalValue + "\n" + fileContents;
+                            document.getElementById("editor").style.height = document.getElementById("editor").scrollHeight + "px";
+                            createTable();
+                            document.getElementById("editor").style.display = "none";
+                            document.getElementById("editor-table").style.display = "block";
+                        }
+                        reader.readAsText(file);
+                        document.getElementById("pngviewer").src = url;
+                        document.getElementById("nocontent-warning").style.display = "none";
+                        document.getElementById("file-error").style.display = "none";
+                        document.getElementById("pngviewer-div").style.display = "block";
+                    });
                 }
-                reader.readAsText(file);
-                document.getElementById("pngviewer").src = url;
-                document.getElementById("nocontent-warning").style.display = "none";
-                document.getElementById("pngviewer-div").style.display = "block";
             });
         });
         input.click();
@@ -452,13 +476,6 @@
             document.getElementById("editor-icon").classList.add("fa-check");
             document.getElementById("editor").style.height = document.getElementById("editor").scrollHeight + "px";
         } else {
-            editing = false;
-            document.getElementById("editor").style.display = "none";
-            document.getElementById("editor-table").style.display = "block";
-            createTable();
-            document.getElementById("editor-apply").innerHTML = document.getElementById("editor-apply").innerHTML.replace("Apply changes", "Edit CSV Data");
-            document.getElementById("editor-icon").classList.remove("fa-check");
-            document.getElementById("editor-icon").classList.add("fa-pencil");
             var fileblob = new Blob([document.getElementById("editor").value], { type: "text/plain;charset=utf-8" });
             const formData = new FormData();
             formData.append("file", fileblob);
@@ -466,11 +483,37 @@
                 method: "POST",
                 body: formData
             })
-            .then(response => response.arrayBuffer())
+            .then(response => {
+                return response.text();
+            })
             .then(data => {
-                const blob = new Blob([data], { type: "image/svg+xml" });
-                const url = URL.createObjectURL(blob);
-                document.getElementById("pngviewer").src = url;
+                if (data.startsWith("<?xml") == false) {
+                    document.getElementById("editor-error-content").innerHTML = data;
+                    document.getElementById("editor-error").style.display = "block";
+                    return;
+                } else {
+                    fetch("/process_file", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => {
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        const blob = new Blob([data], { type: "image/svg+xml" });
+                        const url = URL.createObjectURL(blob);
+                        document.getElementById("pngviewer").src = url;
+                        editing = false;
+                        document.getElementById("editor-error").style.display = "none";
+                        document.getElementById("editor").style.display = "none";
+                        document.getElementById("editor-table").style.display = "block";
+                        createTable();
+                        document.getElementById("editor-apply").innerHTML = document.getElementById("editor-apply").innerHTML.replace("Apply changes", "Edit CSV Data");
+                        document.getElementById("editor-icon").classList.remove("fa-check");
+                        document.getElementById("editor-icon").classList.add("fa-pencil");
+
+                    });
+                }
             });
         }
     });
